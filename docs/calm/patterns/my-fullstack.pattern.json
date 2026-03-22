@@ -9,24 +9,23 @@
             "type": "array",
             "minItems": 2,
             "items": {
-                "anyOf": [
-                    {
-                        "$ref": "https://calm.finos.org/release/1.2/meta/core.json#/defs/node",
-                        "type": "object",
-                        "properties": {
-                            "node-type": {
-                                "const": "service"
-                            },
-                            "metadata": {
-                                "$ref": "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json"
-                            }
-                        },
-                        "required": ["metadata"]
+                "$ref": "https://calm.finos.org/release/1.2/meta/core.json#/defs/node",
+                "if": {
+                    "properties": {
+                        "node-type": {
+                            "const": "service"
+                        }
                     },
-                    {
-                        "$ref": "https://calm.finos.org/release/1.2/meta/core.json#/defs/node"
-                    }
-                ]
+                    "required": ["node-type"]
+                },
+                "then": {
+                    "properties": {
+                        "metadata": {
+                            "$ref": "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json"
+                        }
+                    },
+                    "required": ["metadata"]
+                }
             }
         },
         "relationships": {
