@@ -1,0 +1,38 @@
+# Global ignores
+.DS_Store
+.env
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python
+backend/venv/
+backend/.venv/
+backend/env/
+backend/.env/
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+
+# Node/TypeScript
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.next/
+
+# VSCode
+.vscode/
+
+# Mac system files
+Icon?
+
+# Coverage reports
+coverage/
+
+# Misc
+*.swp
+*.swo
