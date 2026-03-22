@@ -1,6 +1,6 @@
 ---
 description: An AI Assistant for FINOS CALM development.
-tools: ['codebase', 'editFiles', 'fetch', 'runInTerminal']
+tools: [execute/runInTerminal, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, web/fetch]
 ---
 
 # CALM Architecture Assistant
