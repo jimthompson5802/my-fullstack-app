@@ -45,7 +45,21 @@
                     "protocol": "HTTP",
                     "path": "/api/compute"
                 }
-            ]
+            ],
+            "metadata": {
+                "k8s": {
+                    "image": "my-fullstack-frontend:latest",
+                    "namespace": "my-fullstack-app",
+                    "replicas": 1,
+                    "containerPort": 80,
+                    "servicePort": 80,
+                    "nodePort": 30300,
+                    "imagePullPolicy": "IfNotPresent",
+                    "serviceName": "frontend-service",
+                    "deploymentName": "frontend",
+                    "appLabel": "frontend"
+                }
+            }
         },
         {
             "unique-id": "backend-api-service",
@@ -74,7 +88,43 @@
                         }
                     }
                 }
-            ]
+            ],
+            "metadata": {
+                "k8s": {
+                    "image": "my-fullstack-backend:latest",
+                    "namespace": "my-fullstack-app",
+                    "replicas": 1,
+                    "containerPort": 8000,
+                    "servicePort": 8000,
+                    "nodePort": 30800,
+                    "imagePullPolicy": "IfNotPresent",
+                    "serviceName": "backend-service",
+                    "deploymentName": "backend",
+                    "appLabel": "backend",
+                    "env": [
+                        {
+                            "name": "CORS_ORIGINS",
+                            "value": "http://localhost:30300"
+                        }
+                    ],
+                    "livenessProbe": {
+                        "httpGet": {
+                            "path": "/",
+                            "port": 8000
+                        },
+                        "initialDelaySeconds": 10,
+                        "periodSeconds": 10
+                    },
+                    "readinessProbe": {
+                        "httpGet": {
+                            "path": "/",
+                            "port": 8000
+                        },
+                        "initialDelaySeconds": 5,
+                        "periodSeconds": 5
+                    }
+                }
+            }
         }
     ],
     "relationships": [

@@ -1,0 +1,21 @@
+{{#each nodes}}
+{{#if metadata.k8s}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{metadata.k8s.serviceName}}
+  namespace: {{metadata.k8s.namespace}}
+  labels:
+    app: {{metadata.k8s.appLabel}}
+spec:
+  type: NodePort
+  selector:
+    app: {{metadata.k8s.appLabel}}
+  ports:
+  - port: {{metadata.k8s.servicePort}}
+    targetPort: {{metadata.k8s.containerPort}}
+    nodePort: {{metadata.k8s.nodePort}}
+    protocol: TCP
+{{/if}}
+{{/each}}
