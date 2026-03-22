@@ -1,0 +1,150 @@
+{
+    "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+    "unique-id": "my-fullstack-calculator-app",
+    "name": "Calculator Full-Stack Application",
+    "description": "A simple calculator web application with a React/TypeScript frontend and FastAPI/Python backend that performs precise decimal arithmetic operations",
+    "metadata": [
+        {
+            "version": "1.0.0",
+            "created-by": "Architecture Team",
+            "environment": "production",
+            "tech-stack": {
+                "frontend": "React 17 + TypeScript + Webpack",
+                "backend": "FastAPI + Uvicorn + Python 3.14+"
+            }
+        }
+    ],
+    "nodes": [
+        {
+            "unique-id": "user",
+            "node-type": "actor",
+            "name": "User",
+            "description": "End user interacting with the calculator web application through a browser"
+        },
+        {
+            "unique-id": "calculator-app",
+            "node-type": "system",
+            "name": "Calculator App",
+            "description": "Complete calculator application system composed of frontend web UI and backend API service"
+        },
+        {
+            "unique-id": "k8s-cluster",
+            "node-type": "system",
+            "name": "Kubernetes Cluster",
+            "description": "Local Kubernetes cluster for hosting calculator application services"
+        },
+        {
+            "unique-id": "frontend-web-app",
+            "node-type": "service",
+            "name": "Calculator Web UI",
+            "description": "React/TypeScript-based single-page web application providing calculator interface for arithmetic operations",
+            "interfaces": [
+                {
+                    "unique-id": "frontend-http-interface",
+                    "direction": "consumes",
+                    "protocol": "HTTP",
+                    "path": "/api/compute"
+                }
+            ]
+        },
+        {
+            "unique-id": "backend-api-service",
+            "node-type": "service",
+            "name": "Calculator Backend API",
+            "description": "FastAPI REST service exposing arithmetic computation endpoints with CORS support and decimal precision",
+            "interfaces": [
+                {
+                    "unique-id": "compute-api-interface",
+                    "direction": "provides",
+                    "protocol": "HTTP",
+                    "path": "/api/compute",
+                    "schema": {
+                        "request": {
+                            "x": "string (decimal)",
+                            "y": "string (decimal)",
+                            "op": "add|subtract|multiply|divide"
+                        },
+                        "response": {
+                            "result": "string (decimal)"
+                        },
+                        "error": {
+                            "error": "string",
+                            "code": "string",
+                            "details": "object (optional)"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "unique-id": "user-interacts-with-frontend",
+            "description": "User interacts with the calculator web UI through a web browser to perform arithmetic operations",
+            "relationship-type": {
+                "interacts": {
+                    "actor": "user",
+                    "nodes": ["frontend-web-app"]
+                }
+            }
+        },
+        {
+            "unique-id": "frontend-to-backend-api",
+            "description": "Frontend makes HTTP POST requests to backend /api/compute endpoint for arithmetic operations",
+            "relationship-type": {
+                "connects": {
+                    "source": {
+                        "node": "frontend-web-app",
+                        "interface": "frontend-http-interface"
+                    },
+                    "destination": {
+                        "node": "backend-api-service",
+                        "interface": "compute-api-interface"
+                    }
+                }
+            },
+            "protocol": "HTTP",
+            "authentication": "none"
+        },
+        {
+            "unique-id": "calculator-app-composition",
+            "description": "Calculator App system is composed of the frontend web application and backend API service",
+            "relationship-type": {
+                "composed-of": {
+                    "container": "calculator-app",
+                    "nodes": ["frontend-web-app", "backend-api-service"]
+                }
+            }
+        },
+        {
+            "unique-id": "services-deployed-in-k8s",
+            "description": "Frontend and backend services deployed in Kubernetes cluster",
+            "relationship-type": {
+                "deployed-in": {
+                    "container": "k8s-cluster",
+                    "nodes": ["frontend-web-app", "backend-api-service"]
+                }
+            }
+        }
+    ],
+    "controls": {
+        "cors-security-control": {
+            "control-type": "preventative",
+            "description": "Cross-Origin Resource Sharing (CORS) policy allowing frontend origin to access backend API",
+            "requirements": [
+                {
+                    "requirement-id": "cors-policy-requirement",
+                    "requirement-url": "#cors-policy",
+                    "requirement-description": "Backend API must allow cross-origin requests from frontend origin",
+                    "implemented-by": ["backend-api-service"],
+                    "config": {
+                        "allow_origins": ["*"],
+                        "allow_credentials": true,
+                        "allow_methods": ["*"],
+                        "allow_headers": ["*"]
+                    }
+                }
+            ]
+        }
+    }
+}
