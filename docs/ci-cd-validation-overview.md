@@ -45,7 +45,9 @@ For Cloud-based deployments, other tools such as Cloud Formation Templates (CFT)
 
 The **key point** is that the possibility exists of using the CALM Templating process to provide required values from the CALM architecture metadata to drive these other tools used for deployment.
 
-To illustrate this process, here are two runs of validating and architecture prior to deploying an application to a k8s cluster.
+To illustrate this process, here are two runs of validating the architecture prior to deploying an application to a k8s cluster.  For this exercise, we defined 
+- [standard for required metadata](./calm/standards/my-fullstack.standard.json) for CALM `service` nodes that are to run in a k8s cluster
+- [pattern for enforcing the required metadata standard](./calm/patterns/my-fullstack.pattern.json)
 
 ### Invalid architecture
 
