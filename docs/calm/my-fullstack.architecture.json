@@ -47,6 +47,7 @@
                 }
             ],
             "metadata": {
+                "$schema": "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json",
                 "k8s": {
                     "image": "my-fullstack-frontend:latest",
                     "namespace": "my-fullstack-app",
@@ -90,6 +91,7 @@
                 }
             ],
             "metadata": {
+                "$schema": "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json",
                 "k8s": {
                     "image": "my-fullstack-backend:latest",
                     "namespace": "my-fullstack-app",
