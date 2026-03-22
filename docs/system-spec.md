@@ -22,6 +22,7 @@
 3. The user clicks the "Compute" button.
 4. The system performs the selected operation using the values from X and Y.
 5. The result of the computation is displayed in the "Answer" field.
+---
 
 ## Technical Requirements
 
@@ -34,80 +35,272 @@
 - No authentication or authorization is required between the frontend and the backend API.
 
 
-## Compute Location & API Recommendation
+## 1. Overview
 
-Recommendation: perform the numeric computation on the backend service (FastAPI). Rationale:
+This document describes a simple calculator web application with a React/TypeScript frontend and a FastAPI/Python backend. The backend performs all arithmetic using Python's Decimal for precision and consistency.
 
-- Ensures consistent numeric precision and rounding (use Python's Decimal on the backend).
-- Centralizes error handling (e.g., divide-by-zero) and logging/auditing.
-- Avoids JavaScript floating-point pitfalls for critical results.
+## 2. Functional Requirements
 
-Frontend responsibilities:
+1. User enters numeric values into X and Y fields.
+2. User selects one of four operations: add, subtract, multiply, or divide.
+3. User clicks the "Compute" button.
+4. System performs the selected operation using X and Y.
+5. Result is displayed in the "Answer" field.
 
-- Validate input locally (numeric, allowed range, max precision) and disable the `Compute` button until inputs are valid.
-- Send the validated inputs and selected operation to the backend.
-- Show a loading indicator while awaiting response and render errors or the result in the `Answer` field.
+## 3. Technical Requirements
 
-API Contract (recommended):
+- Frontend: TypeScript + React
+- Backend: Python + FastAPI
+- No authentication/authorization required between user/frontend/backend.
 
-- Endpoint: `POST /api/compute`
-- Request JSON:
-  {
-    "x": string,        // decimal representation (recommended) or number
-    "y": string,        // decimal representation (recommended) or number
-    "op": "add|subtract|multiply|divide"
-  }
-- Success Response (200):
-  {
-    "result": string    // decimal representation as string to preserve precision
-  }
-- Error Responses:
-  - 400 Bad Request: validation errors, payload missing or malformed. Example body: `{ "error": "Invalid input", "code": "INVALID_INPUT" }`
-  - 422 Unprocessable Entity: domain errors such as divide-by-zero. Example: `{ "error": "Division by zero", "code": "DIVIDE_BY_ZERO" }`
-  - 500 Internal Server Error: unexpected failures. Example: `{ "error": "Internal error", "code": "SERVER_ERROR" }`
+## 4. UI and User Flow
 
-Notes / Implementation hints:
+### Layout
 
-- Backend should parse `x` and `y` into `Decimal` and perform the operation, returning a rounded/normalized string according to the precision policy.
-- Frontend may send values as strings to avoid JS float rounding before backend conversion.
-- The frontend should display friendly error messages and not expose internal error detail; logging of inputs and errors should happen server-side.
+See ASCII diagram above.
+
+### UI → API Mapping
+
+- X and Y: Accept numeric input (including decimals, exponent notation allowed). Store as trimmed strings.
+- Operation: Radio buttons map to `add`, `subtract`, `multiply`, `divide`.
+- Compute button: Enabled only when both X and Y are non-empty and appear numeric. On click, POSTs JSON to backend.
+- Answer field: Displays result from backend. For display, may format using locale, but must preserve backend value.
+- Errors: Non-2xx responses are shown as friendly messages. Inputs are not mutated on error.
+
+### Frontend Validation & Logging
+
+- Validate X and Y are non-empty and parseable as numbers (Decimal-compatible). Trim whitespace.
+- Do not convert to JS Number before sending; send as string.
+- Log major steps: `compute_clicked`, `validation_failed` (with field), `request_sent` (with op, x, y), `response_received` (with status and error.code), `displayed_result` (with result).
+
+## 5. API Contract
+
+### Endpoint
+
+POST /api/compute
+
+### Request JSON Schema
+```json
+{
+  "type": "object",
+  "properties": {
+    "x": {
+      "type": "string",
+      "description": "Decimal representation parseable by Python Decimal (may include exponent notation, e.g. '1.23', '1e-3'). Leading/trailing whitespace should be trimmed by the client."
+    },
+    "y": {
+      "type": "string",
+      "description": "Decimal representation parseable by Python Decimal."
+    },
+    "op": {
+      "type": "string",
+      "enum": ["add", "subtract", "multiply", "divide"]
+    }
+  },
+  "required": ["x", "y", "op"],
+  "additionalProperties": false
+}
+```
+
+### Validation Rules (Backend)
+
+- x and y must be present and parseable by Python's Decimal.
+- Reject NaN, Infinity, or non-numeric strings.
+- Exponent notation (e.g., '1e-6') is allowed.
+- No additional digit/scale/precision limits enforced by spec (implementations may add operational protections).
+
+### Response Schemas
+
+#### Success (200)
+```json
+{
+  "type": "object",
+  "properties": {
+    "result": { "type": "string", "description": "Decimal string returned by the backend (canonical Decimal string produced by Python Decimal; client should treat this as authoritative)." }
+  },
+  "required": ["result"],
+  "additionalProperties": false
+}
+```
+
+#### Validation Error (400)
+HTTP 400 Bad Request
+```json
+{
+  "error": "Invalid input",
+  "code": "INVALID_INPUT",
+  "details": { "<field>": "<short reason>" }
+}
+```
+
+#### Domain Error (422)
+HTTP 422 Unprocessable Entity
+```json
+{
+  "error": "Division by zero",
+  "code": "DIVIDE_BY_ZERO"
+}
+```
+
+#### Server Error (500)
+HTTP 500 Internal Server Error
+```json
+{
+  "error": "Internal error",
+  "code": "SERVER_ERROR"
+}
+```
+
+### Status Code Mapping
+
+- 400: Malformed JSON or schema validation failure (missing fields, not Decimal-parseable).
+- 422: Domain errors after valid parse (e.g., divide-by-zero).
+- 500: Unexpected server errors.
+
+### Example Requests & Responses
+```
+Request:
+POST /api/compute
+Content-Type: application/json
+{
+  "x": "12.5",
+  "y": "3.25",
+  "op": "add"
+}
+```
+```
+Success (200):
+{
+  "result": "15.75"
+}
+```
+```
+Divide-by-zero (422):
+{
+  "error": "Division by zero",
+  "code": "DIVIDE_BY_ZERO"
+}
+```
+## 6. Backend Implementation Notes
+
+- Parse x and y using Decimal(x) and Decimal(y) after trimming.
+- Reject NaN/Infinity and non-parseable strings with HTTP 400 and a details entry for the offending field.
+- For division, if y is zero, return 422 with code: DIVIDE_BY_ZERO.
+- Return result as the string form of the Decimal result (no extra rounding mandated by this spec; backend may use Python's str(Decimal)).
+
+## 7. Additional Notes
+
+- This spec intentionally keeps validation minimal (numeric only). If operational limits (max digits, request-size, rate limits, or rounding behavior) are needed, add a separate "Operational Constraints" section.
 - Unit tests are not required for this simple calculator implementation.
+    "op": {
+      "type": "string",
+      "enum": ["add", "subtract", "multiply", "divide"]
+    }
+  },
+  "required": ["x", "y", "op"],
+  "additionalProperties": false
+}
 
-## UI → API Mapping
+Validation rules (minimal numeric-only)
+- The server validates that `x` and `y` are present and parseable by Python's `Decimal()` (client may validate similarly).
+- Reject `NaN`, `Infinity`, or non-parseable strings.
+- Exponent notation (e.g., "1e-6") is allowed.
+- No additional digit/scale/precision limits are enforced by the spec (implementation may enforce operational protections separately).
 
-- `X` input: UI accepts numeric characters and optional decimal point. Frontend stores the value as a trimmed string and validates it locally (regex or numeric parse). When calling the API, send `x` as a string containing the decimal representation (e.g. "12.34").
-- `Y` input: same rules as `X`; send as `y` (string).
-- Operation (`op`): map selected radio to one of `add`, `subtract`, `multiply`, `divide` and send as the `op` string in the payload.
-- `Compute` button: enabled only when both `X` and `Y` pass validation; clicking posts JSON `{ "x": "...", "y": "...", "op": "..." }` with `Content-Type: application/json`.
-- `Answer` field: display the `result` string returned by the API; format for display (grouping, locale) only after parsing the returned decimal string.
-- Errors: frontend should treat non-2xx responses as errors and display friendly messages; do not mutate the input values on error.
+Response Schemas
 
-## Logging and Validation
+Success (200)
+```json
+{
+  "type": "object",
+  "properties": {
+    "result": { "type": "string", "description": "Decimal string returned by the backend (canonical Decimal string produced by Python Decimal; client should treat this as authoritative)." }
+  },
+  "required": ["result"],
+  "additionalProperties": false
+}
+```
 
-- Frontend logging: when the user clicks `Compute`, the frontend MUST write concise log messages for each major step: `compute_clicked`, `validation_failed` (include which field failed), `request_sent` (include `op`, `x`, `y`), `response_received` (include status code and `error.code` if present), and `displayed_result` (include `result`). Logs are for diagnostics only and should not expose internal stack traces.
+Validation Error (400)
+HTTP 400 Bad Request
+Body:
+```json
+{
+  "error": "Invalid input",
+  "code": "INVALID_INPUT",
+  "details": { "<field>": "<short reason>" }
+}
+```
 
-- Backend validation and logging: the backend MUST validate all incoming request parameters and MUST NOT trust client-side validation. Validation rules:
-  - `x` and `y` must be present and be valid decimal representations (parseable by Python's `Decimal`).
-  - Reject `NaN`, `Infinity`, or non-numeric strings.
-  - (Optional) Enforce reasonable size/precision limits to avoid excessive resource use; return `400` if limits are exceeded.
+- Use 400 for syntactic JSON errors or when `x`/`y` cannot be parsed by `Decimal` or required fields are missing.
 
-  On each request the backend MUST write log messages for: `request_received` (include received payload), `validation_failed` (include which field and why), `validation_passed`, `operation_performed` (include `op` and operands), and `result_sent` or `error_sent` (include `error.code`). Logs may include enough context for debugging but must avoid leaking sensitive data.
+Domain Error (422)
+HTTP 422 Unprocessable Entity
+Body (example for divide-by-zero):
+```json
+{
+  "error": "Division by zero",
+  "code": "DIVIDE_BY_ZERO"
+}
+```
 
-- Error responses: if validation fails, return `400 Bad Request` with body:
+Server Error (500)
+HTTP 500 Internal Server Error
+Body:
+```json
+{
+  "error": "Internal error",
+  "code": "SERVER_ERROR"
+}
+```
 
-  {
-    "error": "Invalid input",
-    "code": "INVALID_INPUT",
-    "details": { "field": "reason" }
-  }
+Status-code mapping summary
+- 400: malformed JSON or schema validation failure (missing fields, not Decimal-parseable).
+- 422: domain errors after valid parse (e.g., divide-by-zero).
+- 500: unexpected server errors.
 
-  For domain errors (e.g., divide-by-zero) return `422 Unprocessable Entity` with body:
+Examples
 
-  {
-    "error": "Division by zero",
-    "code": "DIVIDE_BY_ZERO"
-  }
+Request
+POST /api/compute
+Content-Type: application/json
+```json
+{
+  "x": "12.5",
+  "y": "3.25",
+  "op": "add"
+}
+```
 
-  For unexpected server errors return `500 Internal Server Error` with a generic message and `code: SERVER_ERROR`.
+Success response (200)
+```json
+{
+  "result": "15.75"
+}
+```
 
-  The frontend should log the error event (`response_received` with error code) and display a friendly message to the user.
+Divide-by-zero (422)
+```json
+{
+  "error": "Division by zero",
+  "code": "DIVIDE_BY_ZERO"
+}
+```
+
+Frontend notes (minimal)
+- Local validation: ensure both `X` and `Y` are non-empty and appear numeric (client may use a simple numeric test or a decimal library). Trim whitespace before validation.
+- Do not convert inputs to JS Number if you need to preserve exact string transmitted to the backend; send `x` and `y` as strings exactly as validated.
+- Disable the `Compute` button until both fields pass the numeric validation.
+- Show a loading indicator while awaiting the response.
+- On success, display the `result` string exactly as returned by the backend. For UI-only formatting (grouping/locale), format from the backend string for visual purposes only; keep the canonical value intact.
+- Treat any non-2xx response as an error: read `code` (if present) and show a friendly message to the user.
+
+Backend notes (minimal)
+- Parse `x` and `y` using `Decimal(x)` and `Decimal(y)` after trimming.
+- Reject `NaN`/`Infinity` and non-parseable strings with HTTP 400 and a `details` entry for the offending field.
+- For division, if `y` is zero, return 422 with `code: DIVIDE_BY_ZERO`.
+- Return `result` as the string form of the Decimal result (no extra rounding mandated by this spec; backend may choose canonical Decimal string formatting such as Python's `str(Decimal)`).
+
+Small clarification for implementers
+- This spec intentionally keeps validation minimal (numeric only). If you later need operational limits (max digits, request-size, rate limits, or rounding behavior), add a separate "Operational Constraints" or "Precision Policy" section.
+
