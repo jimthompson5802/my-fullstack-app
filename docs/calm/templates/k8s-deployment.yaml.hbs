@@ -1,0 +1,51 @@
+{{#each nodes}}
+{{#if metadata.k8s}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{metadata.k8s.deploymentName}}
+  namespace: {{metadata.k8s.namespace}}
+  labels:
+    app: {{metadata.k8s.appLabel}}
+spec:
+  replicas: {{metadata.k8s.replicas}}
+  selector:
+    matchLabels:
+      app: {{metadata.k8s.appLabel}}
+  template:
+    metadata:
+      labels:
+        app: {{metadata.k8s.appLabel}}
+    spec:
+      containers:
+      - name: {{metadata.k8s.appLabel}}
+        image: {{metadata.k8s.image}}
+        imagePullPolicy: {{metadata.k8s.imagePullPolicy}}
+        ports:
+        - containerPort: {{metadata.k8s.containerPort}}
+{{#if metadata.k8s.env}}
+        env:
+{{#each metadata.k8s.env}}
+        - name: {{name}}
+          value: "{{value}}"
+{{/each}}
+{{/if}}
+{{#if metadata.k8s.livenessProbe}}
+        livenessProbe:
+          httpGet:
+            path: {{metadata.k8s.livenessProbe.httpGet.path}}
+            port: {{metadata.k8s.livenessProbe.httpGet.port}}
+          initialDelaySeconds: {{metadata.k8s.livenessProbe.initialDelaySeconds}}
+          periodSeconds: {{metadata.k8s.livenessProbe.periodSeconds}}
+{{/if}}
+{{#if metadata.k8s.readinessProbe}}
+        readinessProbe:
+          httpGet:
+            path: {{metadata.k8s.readinessProbe.httpGet.path}}
+            port: {{metadata.k8s.readinessProbe.httpGet.port}}
+          initialDelaySeconds: {{metadata.k8s.readinessProbe.initialDelaySeconds}}
+          periodSeconds: {{metadata.k8s.readinessProbe.periodSeconds}}
+{{/if}}
+{{/if}}
+{{/each}}
