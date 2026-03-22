@@ -10,13 +10,16 @@ This is the backend component of the my-fullstack-app project. It is built using
 backend/
 ├── src/
 │   ├── __init__.py          # Marks the directory as a Python package
-│   ├── main.py              # Entry point of the backend application
+│   ├── main.py              # FastAPI application and API endpoints
 │   ├── api/
-│   │   └── __init__.py      # Marks the directory as a Python package for API routes
+│   │   └── __init__.py      # Package marker
 │   ├── models/
-│   │   └── __init__.py      # Marks the directory as a Python package for data models
+│   │   ├── __init__.py      # Package marker
+│   │   └── payload.py       # Pydantic models for request/response validation
 │   └── services/
-│       └── __init__.py      # Marks the directory as a Python package for business logic
+│       ├── __init__.py      # Package marker
+│       └── compute_service.py  # Business logic for compute operations
+├── pyproject.toml            # Project metadata and dependencies
 ├── requirements.txt          # Lists the dependencies required for the backend
 └── README.md                 # Documentation for the backend
 ```
@@ -26,24 +29,58 @@ backend/
 To set up the backend application, follow these steps:
 
 1. **Clone the repository**:
-   ```
+   ```bash
    git clone <repository-url>
    cd my-fullstack-app/backend
    ```
 
-2. **Install dependencies**:
-   ```
-   pip install -r requirements.txt
+2. **Install dependencies using uv**:
+   ```bash
+   uv pip install -e .
    ```
 
-3. **Run the application**:
+3. **Run the FastAPI application**:
+   ```bash
+   uv run uvicorn src.main:app --reload --port 8000
    ```
-   python src/main.py
-   ```
+
+The API will be available at `http://localhost:8000`
+
+Interactive API documentation: `http://localhost:8000/docs`
 
 ## API Endpoints
 
-Details about the available API endpoints will be documented here once the API routes are defined in the `api` module.
+### POST /api/compute
+
+Performs arithmetic operations on two decimal numbers.
+
+**Request Body:**
+```json
+{
+  "x": "10",
+  "y": "5",
+  "op": "add"
+}
+```
+
+**Operations:** `add`, `subtract`, `multiply`, `divide`
+
+**Success Response (200):**
+```json
+{
+  "result": "15"
+}
+```
+
+**Error Response (422 - Division by Zero):**
+```json
+{
+  "error": "Division by zero",
+  "code": "DIVIDE_BY_ZERO"
+}
+```
+
+See the full API specification in `docs/system-spec.md`
 
 ## Contributing
 

@@ -17,12 +17,23 @@ backend/.pytest_cache/
 backend/.coverage
 backend/htmlcov/
 
+# Python build artifacts
+*.egg-info/
+dist/
+build/
+.eggs/
+
 # Node/TypeScript
 frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/.env
 frontend/.next/
+
+# Frontend build artifacts
+frontend/.turbo/
+frontend/.cache/
+frontend/.parcel-cache/
 
 # VSCode
 .vscode/
