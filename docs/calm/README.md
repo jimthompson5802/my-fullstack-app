@@ -23,11 +23,27 @@ Your K8s manifests can now be generated from the CALM architecture file where im
 - Auto-generated from architecture + template
 - Ready to deploy: `kubectl apply -f k8s-calm-generated/all-manifests.yaml`
 
+### 📏 K8s Metadata Standard
+[docs/calm/standards/my-fullstack.standard.json](./standards/my-fullstack.standard.json)
+- JSON Schema standard enforcing k8s metadata structure
+- Validates presence of required properties: image, namespace, replicas, serviceName, deploymentName, appLabel
+- Constrains optional properties: ports, environment variables, health probes
+- **Reused by pattern** - Pattern references this standard via `$ref` for centralized maintenance
+
+### 🎯 Architecture Pattern
+[docs/calm/patterns/my-fullstack.pattern.json](./patterns/my-fullstack.pattern.json)
+- Validates complete architecture structure (nodes, relationships)
+- References the k8s metadata standard for service nodes
+- Enforces that service nodes have proper k8s metadata
+- Referenced via [url-mapping.json](./url-mapping.json) for validation
+
 ## Quick Commands
 
 ```bash
-# 1. Validate architecture
-calm validate -a docs/calm/my-fullstack.architecture.json
+# 1. Validate architecture (pattern + standard enforcement)
+calm validate -p docs/calm/patterns/my-fullstack.pattern.json \
+              -a docs/calm/my-fullstack.architecture.json \
+              -u docs/calm/url-mapping.json
 
 # 2. Generate K8s manifests
 calm template \
@@ -69,7 +85,90 @@ calm template -a docs/calm/my-fullstack.architecture.json \
 kubectl apply -f k8s-calm-generated/all-manifests.yaml
 ```
 
-## Key Benefits
+✅ **Centralized Standards** - Pattern reuses standard file via `$ref` for DRY principle
+
+## Pattern & Standard Validation
+
+The architecture uses **both** a pattern and a standard for comprehensive validation:
+
+### Pattern-Based Validation
+[patterns/my-fullstack.pattern.json](./patterns/my-fullstack.pattern.json) validates:
+- Architecture structure (minimum 2 nodes, relationships)
+- Service nodes must have metadata
+- Service nodes metadata must conform to the k8s standard (via `$ref`)
+
+### Standard-Based Validation
+[standards/my-fullstack.standard.json](./standards/my-fullstack.standard.json) defines:
+- Required k8s properties: image, namespace, replicas, serviceName, deploymentName, appLabel
+- Optional properties with constraints: ports (ranges), imagePullPolicy (enum), env, probes
+- **Reused by the pattern** - Single source of truth for k8s metadata structure
+
+### Composition Architecture
+
+```
+Pattern (structure)
+  └─> References Standard (metadata)
+        └─> Defines k8s schema
+
+URL Mapping resolves both references to local files
+```
+
+### How It Works
+
+1. **Pattern defines structure**: The pattern specifies that service nodes must have metadata
+2. **Pattern references standard**: Instead of duplicating the k8s schema, the pattern uses `$ref` to reference the standard
+3. **Standard defines metadata**: The standard file contains the actual k8s metadata schema with all constraints
+4. **URL mapping resolves both**: The url-mapping.json file resolves both the pattern's standard reference and any other URLs to local files
+Validate with both pattern and standard enforcement:
+
+```bash
+calm validate -p docs/calm/patterns/my-fullstack.pattern.json \
+              -a docs/calm/my-fullstack.architecture.json \
+              -u docs/calm/url-mapping.json
+```
+
+**What gets validated:**
+- ✅ Pattern validates architecture structure
+- ✅ Pattern enforces service nodes have metadata
+- ✅ Standard (via pattern `$ref`) validates k8s metadata properties
+- ✅ All required k8s properties present
+- ✅ All optional properties have correct types/ranges Required Properties
+
+All service nodes MUST include these k8s properties:
+- `image` - Docker image name and tag
+- `namespace` - Kubernetes namespace
+- `replicas` - Number of pod replicas
+- `serviceName` - Kubernetes service name
+- `deploymentName` - Kubernetes deployment name
+- `appLabel` - Application label for pod selection
+
+### Optional Properties
+
+These properties are validated but not required:
+- `containerPort`, `servicePort`, `nodePort` - Port configurations
+- `imagePullPolicy` - Must be "Always", "IfNotPresent", or "Never"
+- `env` - Environment variables array
+- `livenessProbe`, `readinessProbe` - Health check configurations
+
+### Validation Command
+
+Always validate with the URL mapping to enforce the standard:
+
+```bash
+calm validate -a docs/calm/my-fullstack.architecture.json -u docs/calm/url-mapping.json
+```
+
+**Expected output:**
+```json
+{
+    "jsonSchemaValidationOutputs": [],
+    "spectralSchemaValidationOutputs": [],
+    "hasErrors": false,
+    "hasWarnings": false
+}
+```
+
+If a service node is missing required k8s properties or has invalid values, validation will fail with specific error messages.
 
 ✅ **Single Source of Truth** - Architecture file contains deployment config  
 ✅ **Version Controlled** - All changes tracked in architecture file  
