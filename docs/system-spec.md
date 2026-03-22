@@ -52,6 +52,7 @@ This document describes a simple calculator web application with a React/TypeScr
 - Frontend: TypeScript + React
 - Backend: Python + FastAPI
 - No authentication/authorization required between user/frontend/backend.
+- uv is used for backend package management using Python 3.14
 
 ## 4. UI and User Flow
 
