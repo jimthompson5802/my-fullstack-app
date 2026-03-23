@@ -48,6 +48,7 @@ The **key point** is that the possibility exists of using the CALM Templating pr
 To illustrate this process, here are two runs of validating the architecture prior to deploying an application to a k8s cluster.  For this exercise, we defined 
 - [standard for required metadata](./calm/standards/my-fullstack.standard.json) for CALM `service` nodes that are to run in a k8s cluster
 - [pattern for enforcing the required metadata standard](./calm/patterns/my-fullstack.pattern.json)
+- CALM [template file](./calm/templates/k8s-manifests.yaml.hbs) to generate k8s manifest file using CALM node metadata attributes.
 
 ### Invalid architecture
 
