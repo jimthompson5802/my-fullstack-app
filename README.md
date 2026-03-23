@@ -2,6 +2,9 @@
 
 A simple calculator web application with a React/TypeScript frontend and FastAPI/Python backend that performs precise decimal arithmetic.
 
+## High-level Architecture
+![](./docs/images/calm-architecture-diagram.png)
+
 ## Features
 
 - Perform basic arithmetic operations: add, subtract, multiply, divide

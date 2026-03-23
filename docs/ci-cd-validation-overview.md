@@ -1,5 +1,8 @@
 # Architecture Validation Step for CI/CD
 
+## Application Architecture
+![](./images/calm-architecture-diagram.png)
+
 ## CALM-Driven Kubernetes Deployment Flow
 
 The following diagram illustrates possible process for generating and deploying Kubernetes manifests from a validated CALM architecture.  
