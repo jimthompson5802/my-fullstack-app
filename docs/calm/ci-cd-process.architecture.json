@@ -17,10 +17,16 @@
       "description": "System that packages the CALM CLI, template data assets, and URL mapping used for architecture validation and rendering"
     },
     {
-      "unique-id": "approved-architecture-standards",
+      "unique-id": "approved-architecture-patterns-standards-controls",
       "node-type": "system",
-      "name": "Approved Architecture Standards",
+      "name": "Approved Architecture Patterns/Standards/Controls",
       "description": "System that groups the approved architecture and pattern artifacts used as the source of truth for validation"
+    },
+    {
+      "unique-id": "application-system",
+      "node-type": "system",
+      "name": "Application System",
+      "description": "System representing the application architecture definition that is validated and deployed by the CI/CD process"
     },
     {
       "unique-id": "calm-cli",
@@ -39,6 +45,18 @@
       "node-type": "data-asset",
       "name": "Pattern File",
       "description": "CALM pattern JSON file defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)"
+    },
+    {
+      "unique-id": "approved-standards",
+      "node-type": "data-asset",
+      "name": "Approved Standards",
+      "description": "Approved standards artifacts used as part of the source of truth for architecture validation"
+    },
+    {
+      "unique-id": "approved-controls",
+      "node-type": "data-asset",
+      "name": "Approved Controls",
+      "description": "Approved control artifacts used as part of the source of truth for architecture validation"
     },
     {
       "unique-id": "url-mapping",
@@ -89,8 +107,18 @@
       "description": "Contains the approved architecture artifacts used by",
       "relationship-type": {
         "composed-of": {
-          "container": "approved-architecture-standards",
-          "nodes": ["architecture-file", "pattern-file"]
+          "container": "approved-architecture-patterns-standards-controls",
+          "nodes": ["pattern-file", "approved-standards", "approved-controls"]
+        }
+      }
+    },
+    {
+      "unique-id": "application-system-composition",
+      "description": "Contains the application architecture definition used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "application-system",
+          "nodes": ["architecture-file"]
         }
       }
     },
