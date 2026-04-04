@@ -1,0 +1,182 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "unique-id": "ci-cd-process",
+  "name": "CI/CD Process",
+  "description": "CALM architecture validation and deployment pipeline. Validates an architecture against a pattern using the CALM CLI, then generates and applies Kubernetes manifests or a Docker Compose file.",
+  "nodes": [
+    {
+      "unique-id": "deployment-operator",
+      "node-type": "actor",
+      "name": "Deployment Operator",
+      "description": "Developer or CI runner that invokes the validate-and-deploy script"
+    },
+    {
+      "unique-id": "calm-cli",
+      "node-type": "service",
+      "name": "CALM CLI",
+      "description": "FINOS CALM CLI tool that validates architectures against patterns and renders architecture templates into deployment manifests"
+    },
+    {
+      "unique-id": "architecture-file",
+      "node-type": "data-asset",
+      "name": "Architecture File",
+      "description": "CALM architecture JSON file describing the system to be deployed (e.g. my-fullstack-k8s.architecture.json)"
+    },
+    {
+      "unique-id": "pattern-file",
+      "node-type": "data-asset",
+      "name": "Pattern File",
+      "description": "CALM pattern JSON file defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)"
+    },
+    {
+      "unique-id": "url-mapping",
+      "node-type": "data-asset",
+      "name": "URL Mapping",
+      "description": "JSON file mapping schema $ref URLs to local file paths, used during validation (docs/calm/url-mapping.json)"
+    },
+    {
+      "unique-id": "k8s-template",
+      "node-type": "data-asset",
+      "name": "Kubernetes Manifest Template",
+      "description": "Handlebars template rendered by the CALM CLI into a Kubernetes manifest file (docs/calm/templates/k8s-manifests.yaml.hbs)"
+    },
+    {
+      "unique-id": "dc-template",
+      "node-type": "data-asset",
+      "name": "Docker Compose Template",
+      "description": "Handlebars template rendered by the CALM CLI into a Docker Compose file (docs/calm/templates/dc-compose.yaml.hbs)"
+    },
+    {
+      "unique-id": "k8s-manifest-output",
+      "node-type": "data-asset",
+      "name": "Generated Kubernetes Manifests",
+      "description": "Kubernetes manifest YAML file generated from the architecture by the CALM CLI (calm-generated-k8s/all-manifests.yaml)"
+    },
+    {
+      "unique-id": "dc-compose-output",
+      "node-type": "data-asset",
+      "name": "Generated Docker Compose File",
+      "description": "Docker Compose YAML file generated from the architecture by the CALM CLI (calm-generated-dc/docker-compose.yml)"
+    },
+    {
+      "unique-id": "kubernetes-cluster",
+      "node-type": "system",
+      "name": "Kubernetes Cluster",
+      "description": "Target Kubernetes cluster to which manifests are applied via kubectl"
+    },
+    {
+      "unique-id": "docker-engine",
+      "node-type": "system",
+      "name": "Docker Engine",
+      "description": "Target Docker host on which services are started via docker compose"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "operator-invokes-pipeline",
+      "description": "Triggers the validate-and-deploy pipeline against",
+      "relationship-type": {
+        "interacts": {
+          "actor": "deployment-operator",
+          "nodes": ["calm-cli"]
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-architecture",
+      "description": "Reads and validates the architecture from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "architecture-file" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-pattern",
+      "description": "Reads the structural pattern constraints from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pattern-file" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-url-mapping",
+      "description": "Resolves schema $ref URLs using",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "url-mapping" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-k8s-template",
+      "description": "Reads the Kubernetes manifest Handlebars template from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "k8s-template" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-dc-template",
+      "description": "Reads the Docker Compose Handlebars template from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "dc-template" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-writes-k8s-manifests",
+      "description": "Renders the architecture into Kubernetes manifests and writes to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "calm-cli" },
+          "destination": { "node": "k8s-manifest-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-writes-dc-compose",
+      "description": "Renders the architecture into a Docker Compose file and writes to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "calm-cli" },
+          "destination": { "node": "dc-compose-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "deploy-to-kubernetes",
+      "description": "Applies generated manifests to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "k8s-manifest-output" },
+          "destination": { "node": "kubernetes-cluster" }
+        }
+      }
+    },
+    {
+      "unique-id": "deploy-to-docker-compose",
+      "description": "Starts services defined in the generated compose file on",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "dc-compose-output" },
+          "destination": { "node": "docker-engine" }
+        }
+      }
+    }
+  ],
+  "metadata": [
+    {
+      "version": "1.0.0",
+      "created-by": "Architecture Team"
+    }
+  ]
+}

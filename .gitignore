@@ -47,3 +47,7 @@ coverage/
 # Misc
 *.swp
 *.swo
+
+# documentation
+*.pdf
+

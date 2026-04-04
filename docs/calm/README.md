@@ -235,3 +235,20 @@ calm template -a docs/calm/my-fullstack.prod.architecture.json \
 4. **Pattern Creation**: Create a CALM pattern for reusable architecture templates
 
 See [TEMPLATE-USAGE.md](./TEMPLATE-USAGE.md) for detailed documentation.
+
+## PDF Generation
+
+Pandoc 3.x can emit an `alt={...}` option on `\includegraphics` for images; LaTeX's `graphicx`/`keyval` parser doesn't recognize `alt` and will error with "Package keyval Error: alt undefined." Use the `mermaid-filter` together with the `add-image-alt.lua` filter to define `alt` as a no-op at the LaTeX level and generate PDFs reliably.
+
+Example command:
+
+```bash
+pandoc docs/calm/ci-cd-pipeline-architecture.md \
+  --filter mermaid-filter \
+  --lua-filter docs/calm/add-image-alt.lua \
+  -o docs/calm/ci-cd-pipeline-architecture.pdf
+```
+
+Notes:
+- The `add-image-alt.lua` filter injects a raw LaTeX header that declares `alt` as a no-op key for the Gin (graphicx) key family.
+- This approach is reusable for other docs that include images produced by filters (e.g., mermaid).
