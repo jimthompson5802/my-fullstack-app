@@ -19,18 +19,32 @@ classDef node fill:#eef1ff,stroke:#007dff,stroke-width:1px,color:#000000;
 classDef iface fill:#f0f0f0,stroke:#b6b6b6,stroke-width:1px,font-size:10px,color:#000000;
 classDef highlight fill:#fdf7ec,stroke:#f0c060,stroke-width:1px,color:#000000;
 
+        subgraph application-system["Application System"]
+        direction TB
+            architecture-file["Architecture File"]:::node
+        end
+        class application-system boundary
+        subgraph approved-architecture-patterns-standards-controls["Approved Architecture Patterns/Standards/Controls"]
+        direction TB
+            approved-controls["Approved Controls"]:::node
+            approved-standards["Approved Standards"]:::node
+            pattern-file["Pattern File"]:::node
+        end
+        class approved-architecture-patterns-standards-controls boundary
+        subgraph ci-cd-pipeline["CI/CD Pipeline"]
+        direction TB
+            calm-cli["CALM CLI"]:::node
+            dc-template["Docker Compose Template"]:::node
+            k8s-template["Kubernetes Manifest Template"]:::node
+            url-mapping["URL Mapping"]:::node
+        end
+        class ci-cd-pipeline boundary
 
-    architecture-file["Architecture File"]:::node
-    calm-cli["CALM CLI"]:::node
     deployment-operator["Deployment Operator"]:::node
-    dc-template["Docker Compose Template"]:::node
     docker-engine["Docker Engine"]:::node
     dc-compose-output["Generated Docker Compose File"]:::node
     k8s-manifest-output["Generated Kubernetes Manifests"]:::node
     kubernetes-cluster["Kubernetes Cluster"]:::node
-    k8s-template["Kubernetes Manifest Template"]:::node
-    pattern-file["Pattern File"]:::node
-    url-mapping["URL Mapping"]:::node
 
     deployment-operator -->|Triggers the validate-and-deploy pipeline against| calm-cli
     architecture-file -->|Reads and validates the architecture from| calm-cli
