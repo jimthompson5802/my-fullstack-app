@@ -35,18 +35,6 @@
       "description": "Service that orchestrates the validate-and-deploy pipeline steps on behalf of the Deployment Operator"
     },
     {
-      "unique-id": "generate-kubernetes-deployment",
-      "node-type": "service",
-      "name": "Generate Kubernetes Deployment",
-      "description": "Service responsible for generating Kubernetes manifests from the architecture using the CALM CLI and deploying them to the cluster"
-    },
-    {
-      "unique-id": "generate-docker-compose-deployment",
-      "node-type": "service",
-      "name": "Generate Docker-Compose Deployment",
-      "description": "Service responsible for generating a Docker Compose file from the architecture using the CALM CLI and starting services on the Docker engine"
-    },
-    {
       "unique-id": "deployer",
       "node-type": "service",
       "name": "Deployer",
@@ -152,7 +140,7 @@
       "relationship-type": {
         "composed-of": {
           "container": "ci-cd-pipeline",
-          "nodes": ["pipeline-orchestrator", "generate-kubernetes-deployment", "generate-docker-compose-deployment", "deployer", "calm-cli", "url-mapping", "k8s-template", "dc-template", "k8s-manifest-output", "dc-compose-output"]
+          "nodes": ["pipeline-orchestrator", "deployer", "calm-cli", "url-mapping", "k8s-template", "dc-template", "k8s-manifest-output", "dc-compose-output"]
         }
       }
     },
@@ -202,7 +190,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "calm-cli" },
-          "destination": { "node": "generate-kubernetes-deployment" }
+          "destination": { "node": "k8s-manifest-output" }
         }
       }
     },
@@ -212,7 +200,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "calm-cli" },
-          "destination": { "node": "generate-docker-compose-deployment" }
+          "destination": { "node": "dc-compose-output" }
         }
       }
     },
@@ -263,26 +251,6 @@
         "connects": {
           "source": { "node": "dc-template" },
           "destination": { "node": "calm-cli" }
-        }
-      }
-    },
-    {
-      "unique-id": "cli-writes-k8s-manifests",
-      "description": "Renders the architecture into Kubernetes manifests and writes to",
-      "relationship-type": {
-        "connects": {
-          "source": { "node": "generate-kubernetes-deployment" },
-          "destination": { "node": "k8s-manifest-output" }
-        }
-      }
-    },
-    {
-      "unique-id": "cli-writes-dc-compose",
-      "description": "Renders the architecture into a Docker Compose file and writes to",
-      "relationship-type": {
-        "connects": {
-          "source": { "node": "generate-docker-compose-deployment" },
-          "destination": { "node": "dc-compose-output" }
         }
       }
     },
@@ -354,9 +322,9 @@
           "description": "CALM CLI reads the Kubernetes Handlebars template"
         },
         {
-          "relationship-unique-id": "cli-writes-k8s-manifests",
+          "relationship-unique-id": "calm-cli-to-generate-k8s",
           "sequence-number": 5,
-          "description": "CALM CLI renders and writes the generated Kubernetes manifests"
+          "description": "CALM CLI uses its templating engine to render the architecture into the generated Kubernetes manifests"
         },
         {
           "relationship-unique-id": "deploy-to-kubernetes",
@@ -391,9 +359,9 @@
           "description": "CALM CLI reads the Docker Compose Handlebars template"
         },
         {
-          "relationship-unique-id": "cli-writes-dc-compose",
+          "relationship-unique-id": "calm-cli-to-generate-dc",
           "sequence-number": 5,
-          "description": "CALM CLI renders and writes the generated Docker Compose file"
+          "description": "CALM CLI uses its templating engine to render the architecture into the generated Docker Compose file"
         },
         {
           "relationship-unique-id": "deploy-to-docker-compose",
