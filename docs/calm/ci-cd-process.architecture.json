@@ -302,34 +302,59 @@
       "description": "End-to-end process to validate a CALM architecture against its pattern and deploy generated Kubernetes manifests to the cluster.",
       "transitions": [
         {
-          "relationship-unique-id": "cli-reads-architecture",
+          "relationship-unique-id": "operator-to-pipeline-orchestrator",
           "sequence-number": 1,
+          "description": "Deployment Operator initiates the pipeline via the Pipeline Orchestrator"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli",
+          "sequence-number": 2,
+          "description": "Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern"
+        },
+        {
+          "relationship-unique-id": "cli-reads-architecture",
+          "sequence-number": 3,
           "description": "CALM CLI reads the architecture file for validation"
         },
         {
           "relationship-unique-id": "cli-reads-pattern",
-          "sequence-number": 2,
+          "sequence-number": 4,
           "description": "CALM CLI reads the pattern file to validate architecture against"
         },
         {
           "relationship-unique-id": "cli-reads-url-mapping",
-          "sequence-number": 3,
+          "sequence-number": 5,
           "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
         },
         {
+          "relationship-unique-id": "orchestrator-to-calm-cli-generate",
+          "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI to generate Kubernetes deployment artifacts"
+        },
+        {
           "relationship-unique-id": "cli-reads-k8s-template",
-          "sequence-number": 4,
+          "sequence-number": 7,
           "description": "CALM CLI reads the Kubernetes Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-to-generate-k8s",
-          "sequence-number": 5,
-          "description": "CALM CLI uses its templating engine to render the architecture into the generated Kubernetes manifests"
+          "sequence-number": 8,
+          "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-deployer",
+          "sequence-number": 9,
+          "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
+        },
+        {
+          "relationship-unique-id": "deployer-to-k8s-manifests",
+          "sequence-number": 10,
+          "description": "Deployer reads the generated Kubernetes manifests"
         },
         {
           "relationship-unique-id": "deploy-to-kubernetes",
-          "sequence-number": 6,
-          "description": "Generated manifests are applied to the Kubernetes cluster via kubectl"
+          "sequence-number": 11,
+          "description": "Deployer applies the manifests to the Kubernetes cluster via kubectl"
         }
       ]
     },
@@ -339,34 +364,59 @@
       "description": "End-to-end process to validate a CALM architecture against its pattern and deploy generated Docker Compose services to the Docker engine.",
       "transitions": [
         {
-          "relationship-unique-id": "cli-reads-architecture",
+          "relationship-unique-id": "operator-to-pipeline-orchestrator",
           "sequence-number": 1,
+          "description": "Deployment Operator initiates the pipeline via the Pipeline Orchestrator"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli",
+          "sequence-number": 2,
+          "description": "Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern"
+        },
+        {
+          "relationship-unique-id": "cli-reads-architecture",
+          "sequence-number": 3,
           "description": "CALM CLI reads the architecture file for validation"
         },
         {
           "relationship-unique-id": "cli-reads-pattern",
-          "sequence-number": 2,
+          "sequence-number": 4,
           "description": "CALM CLI reads the pattern file to validate architecture against"
         },
         {
           "relationship-unique-id": "cli-reads-url-mapping",
-          "sequence-number": 3,
+          "sequence-number": 5,
           "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
         },
         {
+          "relationship-unique-id": "orchestrator-to-calm-cli-generate",
+          "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI to generate Docker Compose deployment artifacts"
+        },
+        {
           "relationship-unique-id": "cli-reads-dc-template",
-          "sequence-number": 4,
+          "sequence-number": 7,
           "description": "CALM CLI reads the Docker Compose Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-to-generate-dc",
-          "sequence-number": 5,
-          "description": "CALM CLI uses its templating engine to render the architecture into the generated Docker Compose file"
+          "sequence-number": 8,
+          "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-deployer",
+          "sequence-number": 9,
+          "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
+        },
+        {
+          "relationship-unique-id": "deployer-to-dc-compose",
+          "sequence-number": 10,
+          "description": "Deployer reads the generated Docker Compose file"
         },
         {
           "relationship-unique-id": "deploy-to-docker-compose",
-          "sequence-number": 6,
-          "description": "Generated compose file is started on the Docker engine via docker compose up"
+          "sequence-number": 11,
+          "description": "Deployer starts services on the Docker engine via docker compose up"
         }
       ]
     }
