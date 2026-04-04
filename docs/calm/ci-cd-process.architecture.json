@@ -187,11 +187,21 @@
       }
     },
     {
+      "unique-id": "orchestrator-to-calm-cli-generate",
+      "description": "Pipeline Orchestrator invokes the CALM CLI to generate deployment artifacts from the architecture",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
       "unique-id": "orchestrator-to-generate-k8s",
       "description": "Pipeline Orchestrator delegates Kubernetes manifest generation and deployment to",
       "relationship-type": {
         "connects": {
-          "source": { "node": "pipeline-orchestrator" },
+          "source": { "node": "calm-cli" },
           "destination": { "node": "generate-kubernetes-deployment" }
         }
       }
@@ -201,7 +211,7 @@
       "description": "Pipeline Orchestrator delegates Docker Compose file generation and deployment to",
       "relationship-type": {
         "connects": {
-          "source": { "node": "pipeline-orchestrator" },
+          "source": { "node": "calm-cli" },
           "destination": { "node": "generate-docker-compose-deployment" }
         }
       }
