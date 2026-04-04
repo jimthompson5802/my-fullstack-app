@@ -1,0 +1,430 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "unique-id": "ci-cd-process",
+  "name": "CI/CD Process",
+  "description": "CALM architecture validation and deployment pipeline. Validates an architecture against a pattern using the CALM CLI, then generates and applies Kubernetes manifests or a Docker Compose file.",
+  "nodes": [
+    {
+      "unique-id": "deployment-operator",
+      "node-type": "actor",
+      "name": "Deployment Operator",
+      "description": "Developer or CI runner that invokes the validate-and-deploy script"
+    },
+    {
+      "unique-id": "ci-cd-pipeline",
+      "node-type": "system",
+      "name": "CI/CD Pipeline",
+      "description": "System that packages the CALM CLI, template data assets, and URL mapping used for architecture validation and rendering"
+    },
+    {
+      "unique-id": "approved-architecture-patterns-standards-controls",
+      "node-type": "system",
+      "name": "Approved Architecture Patterns/Standards/Controls",
+      "description": "System that groups the approved architecture and pattern artifacts used as the source of truth for validation"
+    },
+    {
+      "unique-id": "application-system",
+      "node-type": "system",
+      "name": "Application System",
+      "description": "System representing the application architecture definition that is validated and deployed by the CI/CD process"
+    },
+    {
+      "unique-id": "pipeline-orchestrator",
+      "node-type": "service",
+      "name": "Pipeline Orchestrator",
+      "description": "Service that orchestrates the validate-and-deploy pipeline steps on behalf of the Deployment Operator"
+    },
+    {
+      "unique-id": "deployer",
+      "node-type": "service",
+      "name": "Deployer",
+      "description": "Service responsible for applying generated deployment artifacts to the target infrastructure"
+    },
+    {
+      "unique-id": "calm-cli",
+      "node-type": "service",
+      "name": "CALM CLI",
+      "description": "FINOS CALM CLI tool that validates architectures against patterns and renders architecture templates into deployment manifests"
+    },
+    {
+      "unique-id": "architecture-file",
+      "node-type": "data-asset",
+      "name": "Architecture File",
+      "description": "CALM architecture JSON file describing the system to be deployed (e.g. my-fullstack-k8s.architecture.json)"
+    },
+    {
+      "unique-id": "pattern-file",
+      "node-type": "data-asset",
+      "name": "Pattern File",
+      "description": "CALM pattern JSON file defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)"
+    },
+    {
+      "unique-id": "approved-standards",
+      "node-type": "data-asset",
+      "name": "Approved Standards",
+      "description": "Approved standards artifacts used as part of the source of truth for architecture validation"
+    },
+    {
+      "unique-id": "approved-controls",
+      "node-type": "data-asset",
+      "name": "Approved Controls",
+      "description": "Approved control artifacts used as part of the source of truth for architecture validation"
+    },
+    {
+      "unique-id": "url-mapping",
+      "node-type": "data-asset",
+      "name": "URL Mapping",
+      "description": "JSON file mapping schema $ref URLs to local file paths, used during validation (docs/calm/url-mapping.json)"
+    },
+    {
+      "unique-id": "k8s-template",
+      "node-type": "data-asset",
+      "name": "Kubernetes Manifest Template",
+      "description": "Handlebars template rendered by the CALM CLI into a Kubernetes manifest file (docs/calm/templates/k8s-manifests.yaml.hbs)"
+    },
+    {
+      "unique-id": "dc-template",
+      "node-type": "data-asset",
+      "name": "Docker Compose Template",
+      "description": "Handlebars template rendered by the CALM CLI into a Docker Compose file (docs/calm/templates/dc-compose.yaml.hbs)"
+    },
+    {
+      "unique-id": "k8s-manifest-output",
+      "node-type": "data-asset",
+      "name": "Generated Kubernetes Manifests",
+      "description": "Kubernetes manifest YAML file generated from the architecture by the CALM CLI (calm-generated-k8s/all-manifests.yaml)"
+    },
+    {
+      "unique-id": "dc-compose-output",
+      "node-type": "data-asset",
+      "name": "Generated Docker Compose File",
+      "description": "Docker Compose YAML file generated from the architecture by the CALM CLI (calm-generated-dc/docker-compose.yml)"
+    },
+    {
+      "unique-id": "kubernetes-cluster",
+      "node-type": "system",
+      "name": "Kubernetes Cluster",
+      "description": "Target Kubernetes cluster to which manifests are applied via kubectl"
+    },
+    {
+      "unique-id": "docker-engine",
+      "node-type": "system",
+      "name": "Docker Engine",
+      "description": "Target Docker host on which services are started via docker compose"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "approved-standards-composition",
+      "description": "Contains the approved architecture artifacts used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "approved-architecture-patterns-standards-controls",
+          "nodes": ["pattern-file", "approved-standards", "approved-controls"]
+        }
+      }
+    },
+    {
+      "unique-id": "application-system-composition",
+      "description": "Contains the application architecture definition used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "application-system",
+          "nodes": ["architecture-file"]
+        }
+      }
+    },
+    {
+      "unique-id": "pipeline-composition",
+      "description": "Contains the validation and templating assets used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "ci-cd-pipeline",
+          "nodes": ["pipeline-orchestrator", "deployer", "calm-cli", "url-mapping", "k8s-template", "dc-template", "k8s-manifest-output", "dc-compose-output"]
+        }
+      }
+    },
+    {
+      "unique-id": "operator-to-pipeline-orchestrator",
+      "description": "Deployment Operator interacts with the Pipeline Orchestrator to initiate pipeline execution",
+      "relationship-type": {
+        "interacts": {
+          "actor": "deployment-operator",
+          "nodes": ["pipeline-orchestrator"]
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-deployer",
+      "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "deployer" }
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-calm-cli",
+      "description": "Pipeline Orchestrator invokes the CALM CLI to perform architecture validation",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-calm-cli-generate",
+      "description": "Pipeline Orchestrator invokes the CALM CLI to generate deployment artifacts from the architecture",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "calm-cli-to-generate-k8s",
+      "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests via the Generate Kubernetes Deployment service",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "calm-cli" },
+          "destination": { "node": "k8s-manifest-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "calm-cli-to-generate-dc",
+      "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file via the Generate Docker-Compose Deployment service",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "calm-cli" },
+          "destination": { "node": "dc-compose-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-architecture",
+      "description": "Reads and validates the architecture from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "architecture-file" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-pattern",
+      "description": "Reads the structural pattern constraints from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pattern-file" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-url-mapping",
+      "description": "Resolves schema $ref URLs using",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "url-mapping" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-k8s-template",
+      "description": "Reads the Kubernetes manifest Handlebars template from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "k8s-template" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "cli-reads-dc-template",
+      "description": "Reads the Docker Compose Handlebars template from",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "dc-template" },
+          "destination": { "node": "calm-cli" }
+        }
+      }
+    },
+    {
+      "unique-id": "deployer-to-k8s-manifests",
+      "description": "Deployer reads the generated Kubernetes manifests to apply to the cluster",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "k8s-manifest-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "deployer-to-dc-compose",
+      "description": "Deployer reads the generated Docker Compose file to start services on the Docker engine",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "dc-compose-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "deploy-to-kubernetes",
+      "description": "Applies generated manifests to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "kubernetes-cluster" }
+        }
+      }
+    },
+    {
+      "unique-id": "deploy-to-docker-compose",
+      "description": "Starts services defined in the generated compose file on",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "docker-engine" }
+        }
+      }
+    }
+  ],
+  "flows": [
+    {
+      "unique-id": "deploy-to-k8s-flow",
+      "name": "Kubernetes Deployment",
+      "description": "End-to-end process to validate a CALM architecture against its pattern and deploy generated Kubernetes manifests to the cluster.",
+      "transitions": [
+        {
+          "relationship-unique-id": "operator-to-pipeline-orchestrator",
+          "sequence-number": 1,
+          "description": "Deployment Operator initiates the pipeline via the Pipeline Orchestrator"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli",
+          "sequence-number": 2,
+          "description": "Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern"
+        },
+        {
+          "relationship-unique-id": "cli-reads-architecture",
+          "sequence-number": 3,
+          "description": "CALM CLI reads the architecture file for validation"
+        },
+        {
+          "relationship-unique-id": "cli-reads-pattern",
+          "sequence-number": 4,
+          "description": "CALM CLI reads the pattern file to validate architecture against"
+        },
+        {
+          "relationship-unique-id": "cli-reads-url-mapping",
+          "sequence-number": 5,
+          "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli-generate",
+          "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI to generate Kubernetes deployment artifacts"
+        },
+        {
+          "relationship-unique-id": "cli-reads-k8s-template",
+          "sequence-number": 7,
+          "description": "CALM CLI reads the Kubernetes Handlebars template"
+        },
+        {
+          "relationship-unique-id": "calm-cli-to-generate-k8s",
+          "sequence-number": 8,
+          "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-deployer",
+          "sequence-number": 9,
+          "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
+        },
+        {
+          "relationship-unique-id": "deployer-to-k8s-manifests",
+          "sequence-number": 10,
+          "description": "Deployer reads the generated Kubernetes manifests"
+        },
+        {
+          "relationship-unique-id": "deploy-to-kubernetes",
+          "sequence-number": 11,
+          "description": "Deployer applies the manifests to the Kubernetes cluster via kubectl"
+        }
+      ]
+    },
+    {
+      "unique-id": "deploy-to-dc-flow",
+      "name": "Docker Compose Deployment",
+      "description": "End-to-end process to validate a CALM architecture against its pattern and deploy generated Docker Compose services to the Docker engine.",
+      "transitions": [
+        {
+          "relationship-unique-id": "operator-to-pipeline-orchestrator",
+          "sequence-number": 1,
+          "description": "Deployment Operator initiates the pipeline via the Pipeline Orchestrator"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli",
+          "sequence-number": 2,
+          "description": "Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern"
+        },
+        {
+          "relationship-unique-id": "cli-reads-architecture",
+          "sequence-number": 3,
+          "description": "CALM CLI reads the architecture file for validation"
+        },
+        {
+          "relationship-unique-id": "cli-reads-pattern",
+          "sequence-number": 4,
+          "description": "CALM CLI reads the pattern file to validate architecture against"
+        },
+        {
+          "relationship-unique-id": "cli-reads-url-mapping",
+          "sequence-number": 5,
+          "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-calm-cli-generate",
+          "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI to generate Docker Compose deployment artifacts"
+        },
+        {
+          "relationship-unique-id": "cli-reads-dc-template",
+          "sequence-number": 7,
+          "description": "CALM CLI reads the Docker Compose Handlebars template"
+        },
+        {
+          "relationship-unique-id": "calm-cli-to-generate-dc",
+          "sequence-number": 8,
+          "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file"
+        },
+        {
+          "relationship-unique-id": "orchestrator-to-deployer",
+          "sequence-number": 9,
+          "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
+        },
+        {
+          "relationship-unique-id": "deployer-to-dc-compose",
+          "sequence-number": 10,
+          "description": "Deployer reads the generated Docker Compose file"
+        },
+        {
+          "relationship-unique-id": "deploy-to-docker-compose",
+          "sequence-number": 11,
+          "description": "Deployer starts services on the Docker engine via docker compose up"
+        }
+      ]
+    }
+  ],
+  "metadata": [
+    {
+      "version": "1.0.0",
+      "created-by": "Architecture Team"
+    }
+  ]
+}
