@@ -47,6 +47,12 @@
       "description": "Service responsible for generating a Docker Compose file from the architecture using the CALM CLI and starting services on the Docker engine"
     },
     {
+      "unique-id": "deployer",
+      "node-type": "service",
+      "name": "Deployer",
+      "description": "Service responsible for applying generated deployment artifacts to the target infrastructure"
+    },
+    {
       "unique-id": "calm-cli",
       "node-type": "service",
       "name": "CALM CLI",
@@ -146,7 +152,7 @@
       "relationship-type": {
         "composed-of": {
           "container": "ci-cd-pipeline",
-          "nodes": ["pipeline-orchestrator", "generate-kubernetes-deployment", "generate-docker-compose-deployment", "calm-cli", "url-mapping", "k8s-template", "dc-template", "k8s-manifest-output", "dc-compose-output"]
+          "nodes": ["pipeline-orchestrator", "generate-kubernetes-deployment", "generate-docker-compose-deployment", "deployer", "calm-cli", "url-mapping", "k8s-template", "dc-template", "k8s-manifest-output", "dc-compose-output"]
         }
       }
     },
@@ -157,6 +163,16 @@
         "interacts": {
           "actor": "deployment-operator",
           "nodes": ["pipeline-orchestrator"]
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-deployer",
+      "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "deployer" }
         }
       }
     },
@@ -261,11 +277,31 @@
       }
     },
     {
+      "unique-id": "deployer-to-k8s-manifests",
+      "description": "Deployer reads the generated Kubernetes manifests to apply to the cluster",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "k8s-manifest-output" }
+        }
+      }
+    },
+    {
+      "unique-id": "deployer-to-dc-compose",
+      "description": "Deployer reads the generated Docker Compose file to start services on the Docker engine",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "deployer" },
+          "destination": { "node": "dc-compose-output" }
+        }
+      }
+    },
+    {
       "unique-id": "deploy-to-kubernetes",
       "description": "Applies generated manifests to",
       "relationship-type": {
         "connects": {
-          "source": { "node": "k8s-manifest-output" },
+          "source": { "node": "deployer" },
           "destination": { "node": "kubernetes-cluster" }
         }
       }
@@ -275,7 +311,7 @@
       "description": "Starts services defined in the generated compose file on",
       "relationship-type": {
         "connects": {
-          "source": { "node": "dc-compose-output" },
+          "source": { "node": "deployer" },
           "destination": { "node": "docker-engine" }
         }
       }
