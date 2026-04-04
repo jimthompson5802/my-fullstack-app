@@ -29,6 +29,24 @@
       "description": "System representing the application architecture definition that is validated and deployed by the CI/CD process"
     },
     {
+      "unique-id": "pipeline-orchestrator",
+      "node-type": "service",
+      "name": "Pipeline Orchestrator",
+      "description": "Service that orchestrates the validate-and-deploy pipeline steps on behalf of the Deployment Operator"
+    },
+    {
+      "unique-id": "generate-kubernetes-deployment",
+      "node-type": "service",
+      "name": "Generate Kubernetes Deployment",
+      "description": "Service responsible for generating Kubernetes manifests from the architecture using the CALM CLI and deploying them to the cluster"
+    },
+    {
+      "unique-id": "generate-docker-compose-deployment",
+      "node-type": "service",
+      "name": "Generate Docker-Compose Deployment",
+      "description": "Service responsible for generating a Docker Compose file from the architecture using the CALM CLI and starting services on the Docker engine"
+    },
+    {
       "unique-id": "calm-cli",
       "node-type": "service",
       "name": "CALM CLI",
@@ -128,7 +146,7 @@
       "relationship-type": {
         "composed-of": {
           "container": "ci-cd-pipeline",
-          "nodes": ["calm-cli", "url-mapping", "k8s-template", "dc-template"]
+          "nodes": ["pipeline-orchestrator", "generate-kubernetes-deployment", "generate-docker-compose-deployment", "calm-cli", "url-mapping", "k8s-template", "dc-template"]
         }
       }
     },
@@ -139,6 +157,36 @@
         "interacts": {
           "actor": "deployment-operator",
           "nodes": ["calm-cli"]
+        }
+      }
+    },
+    {
+      "unique-id": "operator-to-pipeline-orchestrator",
+      "description": "Deployment Operator interacts with the Pipeline Orchestrator to initiate pipeline execution",
+      "relationship-type": {
+        "interacts": {
+          "actor": "deployment-operator",
+          "nodes": ["pipeline-orchestrator"]
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-generate-k8s",
+      "description": "Pipeline Orchestrator delegates Kubernetes manifest generation and deployment to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "generate-kubernetes-deployment" }
+        }
+      }
+    },
+    {
+      "unique-id": "orchestrator-to-generate-dc",
+      "description": "Pipeline Orchestrator delegates Docker Compose file generation and deployment to",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "pipeline-orchestrator" },
+          "destination": { "node": "generate-docker-compose-deployment" }
         }
       }
     },
@@ -197,7 +245,7 @@
       "description": "Renders the architecture into Kubernetes manifests and writes to",
       "relationship-type": {
         "connects": {
-          "source": { "node": "calm-cli" },
+          "source": { "node": "generate-kubernetes-deployment" },
           "destination": { "node": "k8s-manifest-output" }
         }
       }
@@ -207,7 +255,7 @@
       "description": "Renders the architecture into a Docker Compose file and writes to",
       "relationship-type": {
         "connects": {
-          "source": { "node": "calm-cli" },
+          "source": { "node": "generate-docker-compose-deployment" },
           "destination": { "node": "dc-compose-output" }
         }
       }
