@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+{{#each nodes}}
+{{#if (lookup metadata "docker-compose")}}
+{{#with (lookup metadata "docker-compose")}}
+  {{lookup . "service-name"}}:
+    image: {{lookup . "image"}}
+{{#if (lookup . "ports")}}
+    ports:
+{{#each (lookup . "ports")}}
+      - "{{this}}"
+{{/each}}
+{{/if}}
+{{#if (lookup . "depends-on")}}
+    depends_on:
+{{#each (lookup . "depends-on")}}
+      - {{this}}
+{{/each}}
+{{/if}}
+{{/with}}
+{{/if}}
+{{/each}}

@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  frontend:
+    image: my-fullstack-frontend:latest
+    ports:
+      - "30300:80"
+    depends_on:
+      - backend
+  backend:
+    image: my-fullstack-backend:latest
+    ports:
+      - "30800:8000"

@@ -1,152 +1,213 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "My FullStack K8s Service Metadata Standard",
-  "description": "Standard for service node metadata ensuring proper Kubernetes deployment configuration",
+  "title": "My FullStack Service Metadata Standard",
+  "description": "Standard for service node metadata supporting Kubernetes or Docker Compose deployment configuration",
   "type": "object",
-  "properties": {
-    "k8s": {
-      "type": "object",
-      "description": "Kubernetes deployment configuration for service nodes",
+  "oneOf": [
+    {
+      "required": [
+        "k8s"
+      ],
       "properties": {
-        "image": {
-          "type": "string",
-          "description": "Docker image name and tag for the container"
-        },
-        "namespace": {
-          "type": "string",
-          "description": "Kubernetes namespace for deployment"
-        },
-        "replicas": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Number of pod replicas to deploy"
-        },
-        "serviceName": {
-          "type": "string",
-          "description": "Kubernetes service resource name"
-        },
-        "deploymentName": {
-          "type": "string",
-          "description": "Kubernetes deployment resource name"
-        },
-        "appLabel": {
-          "type": "string",
-          "description": "Application label used for pod selection"
-        },
-        "containerPort": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
-          "description": "Port exposed by the container"
-        },
-        "servicePort": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
-          "description": "Kubernetes service port"
-        },
-        "nodePort": {
-          "type": "integer",
-          "minimum": 30000,
-          "maximum": 32767,
-          "description": "NodePort for external access (must be in range 30000-32767)"
-        },
-        "imagePullPolicy": {
-          "type": "string",
-          "enum": ["Always", "IfNotPresent", "Never"],
-          "description": "Kubernetes image pull policy"
-        },
-        "env": {
-          "type": "array",
-          "description": "Environment variables for the container",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "Environment variable name"
-              },
-              "value": {
-                "type": "string",
-                "description": "Environment variable value"
+        "k8s": {
+          "type": "object",
+          "description": "Kubernetes deployment configuration for service nodes",
+          "properties": {
+            "image": {
+              "type": "string",
+              "description": "Docker image name and tag for the container"
+            },
+            "namespace": {
+              "type": "string",
+              "description": "Kubernetes namespace for deployment"
+            },
+            "replicas": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of pod replicas to deploy"
+            },
+            "serviceName": {
+              "type": "string",
+              "description": "Kubernetes service resource name"
+            },
+            "deploymentName": {
+              "type": "string",
+              "description": "Kubernetes deployment resource name"
+            },
+            "appLabel": {
+              "type": "string",
+              "description": "Application label used for pod selection"
+            },
+            "containerPort": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "description": "Port exposed by the container"
+            },
+            "servicePort": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "description": "Kubernetes service port"
+            },
+            "nodePort": {
+              "type": "integer",
+              "minimum": 30000,
+              "maximum": 32767,
+              "description": "NodePort for external access (must be in range 30000-32767)"
+            },
+            "imagePullPolicy": {
+              "type": "string",
+              "enum": [
+                "Always",
+                "IfNotPresent",
+                "Never"
+              ],
+              "description": "Kubernetes image pull policy"
+            },
+            "env": {
+              "type": "array",
+              "description": "Environment variables for the container",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Environment variable name"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Environment variable value"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "additionalProperties": false
               }
             },
-            "required": ["name", "value"],
-            "additionalProperties": false
-          }
-        },
-        "livenessProbe": {
-          "type": "object",
-          "description": "Kubernetes liveness probe configuration",
-          "properties": {
-            "httpGet": {
+            "livenessProbe": {
               "type": "object",
+              "description": "Kubernetes liveness probe configuration",
               "properties": {
-                "path": {
-                  "type": "string",
-                  "description": "HTTP path to probe"
+                "httpGet": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "HTTP path to probe"
+                    },
+                    "port": {
+                      "type": "integer",
+                      "description": "Port to probe"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "port"
+                  ]
                 },
-                "port": {
+                "initialDelaySeconds": {
                   "type": "integer",
-                  "description": "Port to probe"
+                  "minimum": 0,
+                  "description": "Delay before first probe"
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Probe frequency"
                 }
-              },
-              "required": ["path", "port"]
+              }
             },
-            "initialDelaySeconds": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "Delay before first probe"
-            },
-            "periodSeconds": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "Probe frequency"
-            }
-          }
-        },
-        "readinessProbe": {
-          "type": "object",
-          "description": "Kubernetes readiness probe configuration",
-          "properties": {
-            "httpGet": {
+            "readinessProbe": {
               "type": "object",
+              "description": "Kubernetes readiness probe configuration",
               "properties": {
-                "path": {
-                  "type": "string",
-                  "description": "HTTP path to probe"
+                "httpGet": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "HTTP path to probe"
+                    },
+                    "port": {
+                      "type": "integer",
+                      "description": "Port to probe"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "port"
+                  ]
                 },
-                "port": {
+                "initialDelaySeconds": {
                   "type": "integer",
-                  "description": "Port to probe"
+                  "minimum": 0,
+                  "description": "Delay before first probe"
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Probe frequency"
                 }
-              },
-              "required": ["path", "port"]
-            },
-            "initialDelaySeconds": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "Delay before first probe"
-            },
-            "periodSeconds": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "Probe frequency"
+              }
             }
-          }
+          },
+          "required": [
+            "image",
+            "namespace",
+            "replicas",
+            "serviceName",
+            "deploymentName",
+            "appLabel"
+          ],
+          "additionalProperties": false
         }
       },
+      "additionalProperties": true
+    },
+    {
       "required": [
-        "image",
-        "namespace",
-        "replicas",
-        "serviceName",
-        "deploymentName",
-        "appLabel"
+        "docker-compose"
       ],
-      "additionalProperties": false
+      "properties": {
+        "docker-compose": {
+          "type": "object",
+          "description": "Docker Compose deployment configuration for service nodes",
+          "properties": {
+            "service-name": {
+              "type": "string",
+              "description": "Logical service name used in the generated Compose file"
+            },
+            "image": {
+              "type": "string",
+              "description": "Container image to run for the service"
+            },
+            "ports": {
+              "type": "array",
+              "description": "Host-to-container port mappings",
+              "items": {
+                "type": "string",
+                "pattern": "^\\d{1,5}:\\d{1,5}$"
+              }
+            },
+            "depends-on": {
+              "type": "array",
+              "description": "List of other service names this service depends on",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "service-name",
+            "image"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
     }
-  },
-  "required": ["k8s"],
-  "additionalProperties": true
+  ]
 }
