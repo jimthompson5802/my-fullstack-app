@@ -137,12 +137,12 @@ URL Mapping: docs/calm/url-mapping.json
 
 ==> Generating Kubernetes manifests...
 Template: docs/calm/templates/k8s-manifests.yaml.hbs
-Output: k8s-calm-generated/all-manifests.yaml
+Output: calm-generated-k8s/all-manifests.yaml
 
 (node:64714) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 info [_TemplateProcessor]:     Using SelfProvidedTemplateLoader for single template file
-info [_TemplateProcessor]:     ✅ Output directory exists: /Users/jim/Desktop/calm-demos/my-fullstack-app/k8s-calm-generated
+info [_TemplateProcessor]:     ✅ Output directory exists: /Users/jim/Desktop/calm-demos/my-fullstack-app/calm-generated-k8s
 warn [_TemplateProcessor]:     ⚠️ Output directory is not empty. Any files not overwritten will remain untouched.
 info [_TemplateProcessor]:     ℹ️ No transformer specified in index.json. Will use TemplateDefaultTransformer.
 info [_TemplateProcessor]:     🔁 No transformer provided. Using TemplateDefaultTransformer.
@@ -160,7 +160,7 @@ info [_TemplateEngine]:     ✅ Registered helper: isArray
 info [_TemplateEngine]:     ✅ Registered helper: join
 info [_TemplateEngine]:     
 🔹 Starting Template Generation...
-info [_TemplateEngine]:     ✅ Generated: /Users/jim/Desktop/calm-demos/my-fullstack-app/k8s-calm-generated/all-manifests.yaml
+info [_TemplateEngine]:     ✅ Generated: /Users/jim/Desktop/calm-demos/my-fullstack-app/calm-generated-k8s/all-manifests.yaml
 info [_TemplateEngine]:     
 ✅ Template Generation Completed!
 info [_TemplateProcessor]:     
@@ -168,7 +168,7 @@ info [_TemplateProcessor]:
 ✓ Kubernetes manifests generated successfully!
 
 ==> Applying Kubernetes manifests...
-Running: kubectl apply -f k8s-calm-generated/all-manifests.yaml
+Running: kubectl apply -f calm-generated-k8s/all-manifests.yaml
 
 deployment.apps/frontend created
 service/frontend-service created
@@ -179,7 +179,7 @@ service/backend-service created
 
 Summary:
   • Architecture validated: docs/calm/my-fullstack.architecture.json
-  • Manifests generated: k8s-calm-generated/all-manifests.yaml
+    • Manifests generated: calm-generated-k8s/all-manifests.yaml
   • Kubernetes resources applied
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/backend    0/1     1            0           0s

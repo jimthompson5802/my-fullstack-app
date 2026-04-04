@@ -51,9 +51,9 @@ PATTERN_FILE="docs/calm/patterns/my-fullstack.pattern.json"
 URL_MAPPING="docs/calm/url-mapping.json"
 K8S_TEMPLATE_FILE="docs/calm/templates/k8s-manifests.yaml.hbs"
 DC_TEMPLATE_FILE="docs/calm/templates/dc-compose.yaml.hbs"
-K8S_OUTPUT_DIR="k8s-calm-generated"
+K8S_OUTPUT_DIR="calm-generated-k8s"
 K8S_OUTPUT_FILE="${K8S_OUTPUT_DIR}/all-manifests.yaml"
-DC_OUTPUT_DIR="dc-calm-generated"
+DC_OUTPUT_DIR="calm-generated-dc"
 DC_OUTPUT_FILE="${DC_OUTPUT_DIR}/docker-compose.yml"
 
 # ---------------------------------------------------------------------------

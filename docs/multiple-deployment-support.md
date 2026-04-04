@@ -9,7 +9,7 @@ The repository will add a node-level Calm metadata property to describe Docker C
 - Add a copy of the architecture file using compose metadata: `docs/calm/my-fullstack-dc.architecture.json`.
 - Update the standards file to validate the new metadata.
 - Add Handlebars templates named with the `dc-` prefix into `docs/calm/templates/`.
-- Update the `calm-validate-and-deploy.sh` script to generate compose output under `dc-calm-generated/` and run Compose when `docker-compose` metadata is present.
+- Update the `calm-validate-and-deploy.sh` script to generate compose output under `calm-generated-dc/` and run Compose when `docker-compose` metadata is present.
 
 Metadata key
 - Use the hyphenated metadata key `docker-compose` at the node level. Hyphenated keys are valid JSON but require tooling and templates to access the key using quoted lookup (examples below). Document this access pattern so code and templates remain consistent.
@@ -71,7 +71,7 @@ services:
   {{/with}}
 
 Generated output location
-- Place generated Docker Compose output in `dc-calm-generated/` with the primary file named `docker-compose.yml`.
+- Place generated Docker Compose output in `calm-generated-dc/` with the primary file named `docker-compose.yml`.
 
 `calm-validate-and-deploy.sh` behavior (clarified)
 - Selection: the script should determine the deployment target by inspecting the provided Calm architecture JSON for node-level metadata. If the file contains any node with a `docker-compose` metadata property the script should select Docker Compose; if it contains any node with `k8s` metadata it should select Kubernetes. If both `docker-compose` and `k8s` metadata are present in the same architecture, the script should fail with an explanatory error and require an explicit `--target` flag from the user to disambiguate.
@@ -95,21 +95,21 @@ Generated output location
   fi
   ```
 
-- Generation: render templates into either the existing k8s output or `dc-calm-generated/docker-compose.yml` for compose.
-- Validation step (recommended): run `docker compose -f dc-calm-generated/docker-compose.yml config` to validate the generated file before deploying.
+ - Generation: render templates into either the existing k8s output or `calm-generated-dc/docker-compose.yml` for compose.
+ - Validation step (recommended): run `docker compose -f calm-generated-dc/docker-compose.yml config` to validate the generated file before deploying.
 - Deploy commands (examples to document):
 
 ```bash
-docker compose -f dc-calm-generated/docker-compose.yml up -d
+docker compose -f calm-generated-dc/docker-compose.yml up -d
 ```
 
 or legacy:
 
 ```bash
-docker-compose -f dc-calm-generated/docker-compose.yml up -d
+docker-compose -f calm-generated-dc/docker-compose.yml up -d
 ```
 
-- When the selected target is Docker Compose the script MUST run the generated compose file (`docker compose -f dc-calm-generated/docker-compose.yml up -d`) after validation; there is no dry-run option for Docker Compose deployments.
+ - When the selected target is Docker Compose the script MUST run the generated compose file (`docker compose -f calm-generated-dc/docker-compose.yml up -d`) after validation; there is no dry-run option for Docker Compose deployments.
 
 Mapping guidance (k8s -> docker-compose)
 - `metadata.k8s.image` -> `docker-compose.image`
@@ -121,14 +121,14 @@ Editorial structure suggestions
 
 Quick test (example commands to document)
 
-```bash
+  ```bash
 
 ./calm-validate-and-deploy.sh --target dc
 
 # Validate generated compose
-docker compose -f dc-calm-generated/docker-compose.yml config
+docker compose -f calm-generated-dc/docker-compose.yml config
 
 # Start services
-docker compose -f dc-calm-generated/docker-compose.yml up -d
+docker compose -f calm-generated-dc/docker-compose.yml up -d
 ```
 
