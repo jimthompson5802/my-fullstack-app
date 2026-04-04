@@ -197,8 +197,8 @@
       }
     },
     {
-      "unique-id": "orchestrator-to-generate-k8s",
-      "description": "Pipeline Orchestrator delegates Kubernetes manifest generation and deployment to",
+      "unique-id": "calm-cli-to-generate-k8s",
+      "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests via the Generate Kubernetes Deployment service",
       "relationship-type": {
         "connects": {
           "source": { "node": "calm-cli" },
@@ -207,8 +207,8 @@
       }
     },
     {
-      "unique-id": "orchestrator-to-generate-dc",
-      "description": "Pipeline Orchestrator delegates Docker Compose file generation and deployment to",
+      "unique-id": "calm-cli-to-generate-dc",
+      "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file via the Generate Docker-Compose Deployment service",
       "relationship-type": {
         "connects": {
           "source": { "node": "calm-cli" },
