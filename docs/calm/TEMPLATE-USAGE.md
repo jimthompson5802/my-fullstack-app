@@ -4,7 +4,7 @@ This directory contains everything needed to generate Kubernetes deployment mani
 
 ## Overview
 
-The CALM architecture file ([my-fullstack.architecture.json](./my-fullstack.architecture.json)) stores all K8s deployment configuration in node metadata under the `k8s` property. Handlebars templates transform this metadata into actual K8s YAML manifests.
+The CALM architecture file ([my-fullstack-k8s.architecture.json](./my-fullstack-k8s.architecture.json)) stores all K8s deployment configuration in node metadata under the `k8s` property. Handlebars templates transform this metadata into actual K8s YAML manifests.
 
 ## Architecture Metadata Structure
 
@@ -48,7 +48,7 @@ Generate complete K8s manifests (Deployments + Services) for all services:
 
 ```bash
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/k8s-manifests.yaml.hbs \
   -o calm-generated-k8s/all-manifests.yaml
 ```
@@ -57,7 +57,7 @@ calm template \
 
 ```bash
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/k8s-deployment.yaml.hbs \
   -o calm-generated-k8s/deployments.yaml
 ```
@@ -66,7 +66,7 @@ calm template \
 
 ```bash
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/k8s-service.yaml.hbs \
   -o calm-generated-k8s/services.yaml
 ```
@@ -77,7 +77,7 @@ Generate a `docker-compose` file representing the architecture for local testing
 
 ```bash
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/dc-compose.yaml.hbs \
   -o calm-generated-dc/docker-compose.yml
 ```
@@ -138,9 +138,9 @@ kubectl get all -n my-fullstack-app
 
 To change deployment settings (e.g., update image, change replica count):
 
-1. Edit `docs/calm/my-fullstack.architecture.json`
-2. Validate: `calm validate -a docs/calm/my-fullstack.architecture.json`
-3. Regenerate: `calm template -a docs/calm/my-fullstack.architecture.json --template docs/calm/templates/k8s-manifests.yaml.hbs -o calm-generated-k8s/all-manifests.yaml`
+1. Edit `docs/calm/my-fullstack-k8s.architecture.json`
+2. Validate: `calm validate -a docs/calm/my-fullstack-k8s.architecture.json`
+3. Regenerate: `calm template -a docs/calm/my-fullstack-k8s.architecture.json --template docs/calm/templates/k8s-manifests.yaml.hbs -o calm-generated-k8s/all-manifests.yaml`
 4. Dry run: `kubectl apply -f calm-generated-k8s/all-manifests.yaml --dry-run=client`
 5. Deploy: `kubectl apply -f calm-generated-k8s/all-manifests.yaml`
 

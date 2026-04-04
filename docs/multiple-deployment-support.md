@@ -43,7 +43,7 @@ Standards / validation guidance
   - `depends-on`: optional array of strings
 
 Architecture copy
-- Add `docs/calm/my-fullstack-dc.architecture.json` as a copy of `docs/calm/my-fullstack.architecture.json` with each node's `k8s` metadata replaced by `docker-compose` metadata conforming to the schema above.
+-- Add `docs/calm/my-fullstack-dc.architecture.json` as a copy of `docs/calm/my-fullstack-k8s.architecture.json` with each node's `k8s` metadata replaced by `docker-compose` metadata conforming to the schema above.
 
 Templates: naming and example
 - Put templates in `docs/calm/templates/` and prefix filenames with `dc-`. Use the `.yaml.hbs` extension for Handlebars YAML templates (for example: `dc-compose.yaml.hbs` or `dc-service-{{serviceName}}.yaml.hbs`).

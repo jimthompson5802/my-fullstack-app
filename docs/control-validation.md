@@ -12,7 +12,7 @@ Read [](file:///...my-fullstack-app/backend/src/main.py)
 
 I'll open the architecture JSON to cite the control and backend env configuration.
 
-Read [](file:///.../my-fullstack-app/docs/calm/my-fullstack.architecture.json)
+Read [](file:///.../my-fullstack-app/docs/calm/my-fullstack-k8s.architecture.json)
 
 Tracking steps: verify CORS implementation and report findings.
 
@@ -26,9 +26,9 @@ Evidence:
     - `app.add_middleware(CORSMiddleware, allow_origins=cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])`
     - the file also reads `CORS_ORIGINS` from the environment and defaults to `"*"` if unset.
 - Model/spec confirmation: the architecture control requires these settings and marks the backend as the implementer:
-  - my-fullstack.architecture.json includes the `cors-security-control` requirement (implemented-by `backend-api-service`) and the config:
+  - my-fullstack-k8s.architecture.json includes the `cors-security-control` requirement (implemented-by `backend-api-service`) and the config:
     - `"allow_origins": ["*"], "allow_credentials": true, "allow_methods": ["*"], "allow_headers": ["*"]`
-  - the backend node metadata also sets an env var `CORS_ORIGINS` to `http://localhost:30300`: my-fullstack.architecture.json.
+  - the backend node metadata also sets an env var `CORS_ORIGINS` to `http://localhost:30300`: my-fullstack-k8s.architecture.json.
 
 **Screenshot**
 

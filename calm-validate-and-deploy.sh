@@ -16,10 +16,10 @@
 #   ./calm-validate-and-deploy.sh [--target k8s|dc] <architecture-file>
 #
 # EXAMPLES:
-#   ./calm-validate-and-deploy.sh docs/calm/my-fullstack.architecture.json
+#   ./calm-validate-and-deploy.sh docs/calm/my-fullstack-k8s.architecture.json
 #   ./calm-validate-and-deploy.sh docs/calm/my-fullstack-dc.architecture.json
 #   ./calm-validate-and-deploy.sh --target dc docs/calm/my-fullstack-dc.architecture.json
-#   ./calm-validate-and-deploy.sh --target k8s docs/calm/my-fullstack.architecture.json
+#   ./calm-validate-and-deploy.sh --target k8s docs/calm/my-fullstack-k8s.architecture.json
 #
 # PREREQUISITES:
 #   - calm-cli installed (npm install -g @finos/calm-cli)
@@ -88,7 +88,7 @@ done
 if [[ -z "$ARCHITECTURE_FILE" ]]; then
     echo -e "${RED}Error: Architecture file not provided${NC}"
     echo "Usage: $0 [--target k8s|dc] <architecture-file>"
-    echo "Example: $0 docs/calm/my-fullstack.architecture.json"
+    echo "Example: $0 docs/calm/my-fullstack-k8s.architecture.json"
     exit 1
 fi
 

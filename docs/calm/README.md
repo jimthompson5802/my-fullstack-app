@@ -7,7 +7,7 @@ Your K8s manifests can now be generated from the CALM architecture file where im
 ## What You Have Now
 
 ### 📋 Architecture File
-[docs/calm/my-fullstack.architecture.json](./my-fullstack.architecture.json)
+[docs/calm/my-fullstack-k8s.architecture.json](./my-fullstack-k8s.architecture.json)
 - Contains all K8s configuration in `metadata.k8s` for each service node
 - Single source of truth for deployment settings
 - CALM-validated before generation
@@ -46,12 +46,12 @@ Your K8s manifests can now be generated from the CALM architecture file where im
 ```bash
 # 1. Validate architecture (pattern + standard enforcement)
 calm validate -p docs/calm/patterns/my-fullstack.pattern.json \
-              -a docs/calm/my-fullstack.architecture.json \
+              -a docs/calm/my-fullstack-k8s.architecture.json \
               -u docs/calm/url-mapping.json
 
 # 2. Generate K8s manifests
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/k8s-manifests.yaml.hbs \
   -o calm-generated-k8s/all-manifests.yaml
 
@@ -67,7 +67,7 @@ kubectl apply -f calm-generated-k8s/all-manifests.yaml
 ```bash
 # 1. Generate docker-compose file from the architecture
 calm template \
-  -a docs/calm/my-fullstack.architecture.json \
+  -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/dc-compose.yaml.hbs \
   -o calm-generated-dc/docker-compose.yml
 
@@ -101,7 +101,7 @@ Edit the architecture file:
 Then regenerate:
 
 ```bash
-calm template -a docs/calm/my-fullstack.architecture.json \
+calm template -a docs/calm/my-fullstack-k8s.architecture.json \
   --template docs/calm/templates/k8s-manifests.yaml.hbs \
   -o calm-generated-k8s/all-manifests.yaml
 
@@ -146,7 +146,7 @@ Validate with both pattern and standard enforcement:
 
 ```bash
 calm validate -p docs/calm/patterns/my-fullstack.pattern.json \
-              -a docs/calm/my-fullstack.architecture.json \
+              -a docs/calm/my-fullstack-k8s.architecture.json \
               -u docs/calm/url-mapping.json
 ```
 
@@ -178,7 +178,7 @@ These properties are validated but not required:
 Always validate with the URL mapping to enforce the standard:
 
 ```bash
-calm validate -a docs/calm/my-fullstack.architecture.json -u docs/calm/url-mapping.json
+calm validate -a docs/calm/my-fullstack-k8s.architecture.json -u docs/calm/url-mapping.json
 ```
 
 **Expected output:**

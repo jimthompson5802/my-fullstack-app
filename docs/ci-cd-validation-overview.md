@@ -1,5 +1,7 @@
 # Architecture Validation Step for CI/CD
 
+This document describes the CI/CD validation step used in this repository. It explains how a CALM architecture JSON is validated against organizational patterns and standards, how the validated model is used to generate deployment artifacts (Kubernetes manifests or a Docker Compose stack), and how those artifacts can be integrated into CI/CD pipelines for automated validation and deployment. Intended readers: platform engineers, CI authors, and developers configuring deployment pipelines.
+
 ## Application Architecture
 ![](./images/calm-architecture-diagram.png)
 
@@ -19,6 +21,36 @@ The following diagram illustrates possible process for generating and deploying 
 - **Runtime Validation & Feedback**: Operational feedback and runtime validation (such as drift detection or ops feedback) are collected from the running environment, closing the loop for continuous improvement.
 
 This flow ensures that Kubernetes deployments are always traceable to validated architecture models, with automated documentation and governance, and supports feedback-driven iteration.
+
+## CALM-Driven Docker Compose (local testing)
+
+In addition to generating Kubernetes manifests, the CALM templating process in this repository can produce a Docker Compose stack for local development and testing. When the architecture contains node-level `docker-compose` metadata, the same templating workflow can render a `docker-compose.yml` into the generated output directory `calm-generated-dc/`.
+
+Key points:
+- Templates for Compose are located in `docs/calm/templates/` (example: `dc-compose.yaml.hbs`).
+- The CLI script `calm-validate-and-deploy.sh` will detect `docker-compose` metadata and generate the Compose file, then validate and optionally start services using Docker Compose.
+- Generated compose output: `calm-generated-dc/docker-compose.yml`.
+
+Quick commands (local)
+
+```bash
+# Generate compose from architecture
+calm template \
+    -a docs/calm/my-fullstack-dc.architecture.json \
+    --template docs/calm/templates/dc-compose.yaml.hbs \
+    -o calm-generated-dc/docker-compose.yml
+
+# Validate the generated compose file
+docker compose -f calm-generated-dc/docker-compose.yml config
+
+# Start services
+docker compose -f calm-generated-dc/docker-compose.yml up -d
+
+# Stop and remove
+docker compose -f calm-generated-dc/docker-compose.yml down
+```
+
+When using the `calm-validate-and-deploy.sh` script you can either rely on automatic detection (it will pick the target based on metadata) or pass `--target dc` to explicitly select Docker Compose.
 
 ```mermaid
 flowchart TD
@@ -122,14 +154,14 @@ info [calm-validate]:     Formatting output as json
 
 ### Valid architecture
 
-This [architecture](./calm/my-fullstack.architecture.json) passes the development organization's standard for [required metadata](./calm/standards/my-fullstack.standard.json).  The standard is part of development organization's [approved pattern](./calm/patterns/my-fullstack.pattern.json).
+This [architecture](./calm/my-fullstack-k8s.architecture.json) passes the development organization's standard for [required metadata](./calm/standards/my-fullstack.standard.json).  The standard is part of development organization's [approved pattern](./calm/patterns/my-fullstack.pattern.json).
 
 Running [the same bash script](../calm-validate-and-deploy.sh) as before we see validation of the architecture and deployment of the application to the k8s cluster.
 
 ```
-$ ./calm-validate-and-deploy.sh docs/calm/my-fullstack.architecture.json 
+$ ./calm-validate-and-deploy.sh docs/calm/my-fullstack-k8s.architecture.json 
 ==> Validating architecture against pattern...
-Architecture: docs/calm/my-fullstack.architecture.json
+Architecture: docs/calm/my-fullstack-k8s.architecture.json
 Pattern: docs/calm/patterns/my-fullstack.pattern.json
 URL Mapping: docs/calm/url-mapping.json
 
@@ -178,7 +210,7 @@ service/backend-service created
 ✓ Deployment successful!
 
 Summary:
-  • Architecture validated: docs/calm/my-fullstack.architecture.json
+    • Architecture validated: docs/calm/my-fullstack-k8s.architecture.json
     • Manifests generated: calm-generated-k8s/all-manifests.yaml
   • Kubernetes resources applied
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
