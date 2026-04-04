@@ -11,6 +11,18 @@
       "description": "Developer or CI runner that invokes the validate-and-deploy script"
     },
     {
+      "unique-id": "ci-cd-pipeline",
+      "node-type": "system",
+      "name": "CI/CD Pipeline",
+      "description": "System that packages the CALM CLI, template data assets, and URL mapping used for architecture validation and rendering"
+    },
+    {
+      "unique-id": "approved-architecture-standards",
+      "node-type": "system",
+      "name": "Approved Architecture Standards",
+      "description": "System that groups the approved architecture and pattern artifacts used as the source of truth for validation"
+    },
+    {
       "unique-id": "calm-cli",
       "node-type": "service",
       "name": "CALM CLI",
@@ -72,6 +84,26 @@
     }
   ],
   "relationships": [
+    {
+      "unique-id": "approved-standards-composition",
+      "description": "Contains the approved architecture artifacts used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "approved-architecture-standards",
+          "nodes": ["architecture-file", "pattern-file"]
+        }
+      }
+    },
+    {
+      "unique-id": "pipeline-composition",
+      "description": "Contains the validation and templating assets used by",
+      "relationship-type": {
+        "composed-of": {
+          "container": "ci-cd-pipeline",
+          "nodes": ["calm-cli", "url-mapping", "k8s-template", "dc-template"]
+        }
+      }
+    },
     {
       "unique-id": "operator-invokes-pipeline",
       "description": "Triggers the validate-and-deploy pipeline against",
