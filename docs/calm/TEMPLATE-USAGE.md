@@ -38,6 +38,7 @@ Backend nodes can include additional configuration like environment variables an
 - **`k8s-manifests.yaml.hbs`** - Combined template (generates all Deployments + Services in one file)
 - **`k8s-deployment.yaml.hbs`** - Generates only Deployment manifests
 - **`k8s-service.yaml.hbs`** - Generates only Service manifests
+- **`dc-compose.yaml.hbs`** - Generates a `docker-compose` stack for local development
 
 ## Usage
 
@@ -68,6 +69,30 @@ calm template \
   -a docs/calm/my-fullstack.architecture.json \
   --template docs/calm/templates/k8s-service.yaml.hbs \
   -o k8s-calm-generated/services.yaml
+```
+
+### Generate Docker Compose
+
+Generate a `docker-compose` file representing the architecture for local testing:
+
+```bash
+calm template \
+  -a docs/calm/my-fullstack.architecture.json \
+  --template docs/calm/templates/dc-compose.yaml.hbs \
+  -o dc-calm-generated/docker-compose.yml
+```
+
+Validate and run locally:
+
+```bash
+# Validate generated compose
+docker compose -f dc-calm-generated/docker-compose.yml config
+
+# Run the stack
+docker compose -f dc-calm-generated/docker-compose.yml up -d
+
+# Tear down
+docker compose -f dc-calm-generated/docker-compose.yml down
 ```
 
 ## Validate Generated Manifests (Dry Run)

@@ -17,11 +17,15 @@ Your K8s manifests can now be generated from the CALM architecture file where im
 - `k8s-manifests.yaml.hbs` - Generates complete K8s manifests
 - `k8s-deployment.yaml.hbs` - Deployment manifests only
 - `k8s-service.yaml.hbs` - Service manifests only
+- `dc-compose.yaml.hbs` - Generates a docker-compose stack for local testing
 
 ### 📦 Generated Manifests
-[k8s-calm-generated/all-manifests.yaml](../k8s-calm-generated/all-manifests.yaml)
-- Auto-generated from architecture + template
-- Ready to deploy: `kubectl apply -f k8s-calm-generated/all-manifests.yaml`
+- [k8s-calm-generated/all-manifests.yaml](../k8s-calm-generated/all-manifests.yaml)
+  - Auto-generated from architecture + template
+  - Ready to deploy: `kubectl apply -f k8s-calm-generated/all-manifests.yaml`
+- [dc-calm-generated/docker-compose.yml](../dc-calm-generated/docker-compose.yml)
+  - Generated docker-compose file for local development and testing
+  - Ready to run: `docker compose -f dc-calm-generated/docker-compose.yml up -d`
 
 ### 📏 K8s Metadata Standard
 [docs/calm/standards/my-fullstack.standard.json](./standards/my-fullstack.standard.json)
@@ -56,6 +60,25 @@ kubectl apply -f k8s-calm-generated/all-manifests.yaml --dry-run=client
 
 # 4. Deploy to K8s
 kubectl apply -f k8s-calm-generated/all-manifests.yaml
+```
+
+### Docker Compose (local)
+
+```bash
+# 1. Generate docker-compose file from the architecture
+calm template \
+  -a docs/calm/my-fullstack.architecture.json \
+  --template docs/calm/templates/dc-compose.yaml.hbs \
+  -o dc-calm-generated/docker-compose.yml
+
+# 2. Validate generated compose file
+docker compose -f dc-calm-generated/docker-compose.yml config
+
+# 3. Run the stack locally
+docker compose -f dc-calm-generated/docker-compose.yml up -d
+
+# 4. Tear down
+docker compose -f dc-calm-generated/docker-compose.yml down
 ```
 
 ## Example: Change Backend Image
