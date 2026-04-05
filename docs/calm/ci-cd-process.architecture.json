@@ -214,7 +214,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "pipeline-orchestrator" },
-          "destination": { "node": "deployer" }
+          "destination": { "node": "application-deployment" }
         }
       }
     },
@@ -224,7 +224,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "pipeline-orchestrator" },
-          "destination": { "node": "calm-cli-templating" }
+          "destination": { "node": "deployment-generation" }
         }
       }
     },
@@ -234,7 +234,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "pipeline-orchestrator" },
-          "destination": { "node": "calm-cli-validation" }
+          "destination": { "node": "architecture-validation" }
         }
       }
     },
@@ -285,6 +285,16 @@
         "connects": {
           "source": { "node": "url-mapping" },
           "destination": { "node": "calm-cli-validation" }
+        }
+      }
+    },
+    {
+      "unique-id": "architecture-file-to-calm-cli-templating",
+      "description": "Architecture file is read by the CALM CLI Templating service for rendering deployment artifacts",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "architecture-file" },
+          "destination": { "node": "calm-cli-templating" }
         }
       }
     },
@@ -386,28 +396,33 @@
           "description": "Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts"
         },
         {
-          "relationship-unique-id": "cli-reads-k8s-template",
+          "relationship-unique-id": "architecture-file-to-calm-cli-templating",
           "sequence-number": 7,
+          "description": "CALM CLI Templating reads the architecture file for rendering"
+        },
+        {
+          "relationship-unique-id": "cli-reads-k8s-template",
+          "sequence-number": 8,
           "description": "CALM CLI reads the Kubernetes Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-validation-to-generate-k8s",
-          "sequence-number": 8,
+          "sequence-number": 9,
           "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests"
         },
         {
           "relationship-unique-id": "orchestrator-to-deployer",
-          "sequence-number": 9,
+          "sequence-number": 10,
           "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
         },
         {
           "relationship-unique-id": "deployer-to-k8s-manifests",
-          "sequence-number": 10,
+          "sequence-number": 11,
           "description": "Deployer reads the generated Kubernetes manifests"
         },
         {
           "relationship-unique-id": "deploy-to-kubernetes",
-          "sequence-number": 11,
+          "sequence-number": 12,
           "description": "Deployer applies the manifests to the Kubernetes cluster via kubectl"
         }
       ]
@@ -448,28 +463,33 @@
           "description": "Pipeline Orchestrator invokes CALM CLI Templating to generate Docker Compose deployment artifacts"
         },
         {
-          "relationship-unique-id": "cli-reads-dc-template",
+          "relationship-unique-id": "architecture-file-to-calm-cli-templating",
           "sequence-number": 7,
+          "description": "CALM CLI Templating reads the architecture file for rendering"
+        },
+        {
+          "relationship-unique-id": "cli-reads-dc-template",
+          "sequence-number": 8,
           "description": "CALM CLI reads the Docker Compose Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-validation-to-generate-dc",
-          "sequence-number": 8,
+          "sequence-number": 9,
           "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file"
         },
         {
           "relationship-unique-id": "orchestrator-to-deployer",
-          "sequence-number": 9,
+          "sequence-number": 10,
           "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
         },
         {
           "relationship-unique-id": "deployer-to-dc-compose",
-          "sequence-number": 10,
+          "sequence-number": 11,
           "description": "Deployer reads the generated Docker Compose file"
         },
         {
           "relationship-unique-id": "deploy-to-docker-compose",
-          "sequence-number": 11,
+          "sequence-number": 12,
           "description": "Deployer starts services on the Docker engine via docker compose up"
         }
       ]
