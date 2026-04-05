@@ -1,0 +1,21 @@
+
+## Architecture Overview
+{{block-architecture}}
+
+## Nodes
+{{#each nodes}}
+### Name: {{this.name}}  Type: {{this.node-type}}
+
+{{this.description}}
+
+---
+{{/each}}
+
+## Flows
+
+### Deploy to Kubernetes
+{{flow-sequence flow-id="deploy-to-k8s-flow"}}
+
+---
+### Deploy to Docker Compose
+{{flow-sequence flow-id="deploy-to-dc-flow"}}

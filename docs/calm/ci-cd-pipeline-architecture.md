@@ -195,3 +195,41 @@ System responsible for applying generated deployment artifacts to the target inf
 
 ---
 
+## Flows
+
+### Deploy to Kubernetes
+```mermaid
+sequenceDiagram
+    Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
+    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
+    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
+    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
+    Kubernetes Manifest Template ->> CALM CLI Templating: CALM CLI reads the Kubernetes Handlebars template
+    CALM CLI Templating ->> Generated Kubernetes Manifests: CALM CLI uses its templating engine to render the architecture into Kubernetes manifests
+    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Deployer ->> Generated Kubernetes Manifests: Deployer reads the generated Kubernetes manifests
+    Deployer ->> Kubernetes Cluster: Deployer applies the manifests to the Kubernetes cluster via kubectl
+```
+
+
+
+---
+### Deploy to Docker Compose
+```mermaid
+sequenceDiagram
+    Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
+    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
+    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
+    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Docker Compose deployment artifacts
+    Docker Compose Template ->> CALM CLI Templating: CALM CLI reads the Docker Compose Handlebars template
+    CALM CLI Templating ->> Generated Docker Compose File: CALM CLI uses its templating engine to render the architecture into a Docker Compose file
+    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Deployer ->> Generated Docker Compose File: Deployer reads the generated Docker Compose file
+    Deployer ->> Docker Engine: Deployer starts services on the Docker engine via docker compose up
+```
+
+
