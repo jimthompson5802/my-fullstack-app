@@ -50,6 +50,127 @@ For Cloud-based deployments, other tools such as Cloud Formation Templates (CFT)
 
 The **key point** is that using the CALM Templating process can provide required values from the CALM architecture metadata to drive tools used for deployment.  This ensures that deployments are always traceable to validated architecture models, with automated documentation and governance, and supports feedback-driven iteration.
 
+## CALM Architecture For Deployment
+
+### Architecture
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    fontFamily: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', sans-serif
+    darkMode: false
+    fontSize: 14px
+    edgeLabelBackground: '#d5d7e1'
+    lineColor: '#000000'
+---
+%%{init: {"layout": "elk", "flowchart": {"htmlLabels": false}}}%%
+flowchart TB
+classDef boundary fill:#e1e4f0,stroke:#204485,stroke-dasharray: 5 4,stroke-width:1px,color:#000000;
+classDef node fill:#eef1ff,stroke:#007dff,stroke-width:1px,color:#000000;
+classDef iface fill:#f0f0f0,stroke:#b6b6b6,stroke-width:1px,font-size:10px,color:#000000;
+classDef highlight fill:#fdf7ec,stroke:#f0c060,stroke-width:1px,color:#000000;
+classDef actor fill:#eef1ff,stroke:#007dff,stroke-width:1px,color:#000000;
+classDef database fill:#eef1ff,stroke:#2052a2,stroke-width:1px,color:#000000;
+classDef webclient fill:#eef1ff,stroke:#156edf,stroke-width:1px,color:#000000;
+classDef service fill:#eef1ff,stroke:#1c60c0,stroke-width:1px,color:#000000;
+classDef messagebus fill:#eef1ff,stroke:#1c60c0,stroke-width:1px,color:#000000;
+classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
+
+        subgraph application-system["Application System"]
+        direction TB
+            architecture-file["Architecture File"]:::node
+        end
+        class application-system boundary
+        subgraph approved-architecture-patterns-standards-controls["Approved Architecture Patterns/Standards/Controls"]
+        direction TB
+            approved-controls["Approved Controls"]:::node
+            approved-standards["Approved Standards"]:::node
+            pattern-file["Pattern File"]:::node
+        end
+        class approved-architecture-patterns-standards-controls boundary
+        subgraph ci-cd-pipeline["CI/CD Pipeline"]
+        direction TB
+            dc-template["Docker Compose Template"]:::node
+            dc-compose-output["Generated Docker Compose File"]:::node
+            k8s-manifest-output["Generated Kubernetes Manifests"]:::node
+            k8s-template["Kubernetes Manifest Template"]:::node
+            pipeline-orchestrator[/"⚙️ Pipeline Orchestrator"/]:::service
+            url-mapping["URL Mapping"]:::node
+                subgraph application-deployment["Application Deployment"]
+                direction TB
+                    deployer[/"⚙️ Deployer"/]:::service
+                end
+                class application-deployment boundary
+                subgraph architecture-validation["Architecture Validation"]
+                direction TB
+                    calm-cli-validation[/"⚙️ CALM CLI Validation"/]:::service
+                end
+                class architecture-validation boundary
+                subgraph deployment-generation["Deployment Generation"]
+                direction TB
+                    calm-cli-templating[/"⚙️ CALM CLI Templating"/]:::service
+                end
+                class deployment-generation boundary
+        end
+        class ci-cd-pipeline boundary
+
+    deployment-operator([👤 Deployment Operator]):::actor
+    docker-engine[🏢 Docker Engine]:::system
+    kubernetes-cluster[🏢 Kubernetes Cluster]:::system
+
+    deployment-operator -->|Deployment Operator interacts with the Pipeline Orchestrator to initiate pipeline execution| pipeline-orchestrator
+    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer| deployer
+    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment artifact generation to the Deployment Generation system| calm-cli-templating
+    pipeline-orchestrator -->|Pipeline Orchestrator invokes the CALM CLI to perform architecture validation| calm-cli-validation
+    calm-cli-templating -->|CALM CLI uses its templating engine to render the architecture into Kubernetes manifests via the Generate Kubernetes Deployment service| k8s-manifest-output
+    calm-cli-templating -->|CALM CLI uses its templating engine to render the architecture into a Docker Compose file via the Generate Docker-Compose Deployment service| dc-compose-output
+    architecture-file -->|Reads and validates the architecture from| calm-cli-validation
+    pattern-file -->|Reads the structural pattern constraints from| calm-cli-validation
+    url-mapping -->|Resolves schema $ref URLs using| calm-cli-validation
+    k8s-template -->|Reads the Kubernetes manifest Handlebars template from| calm-cli-templating
+    dc-template -->|Reads the Docker Compose Handlebars template from| calm-cli-templating
+    deployer -->|Deployer reads the generated Kubernetes manifests to apply to the cluster| k8s-manifest-output
+    deployer -->|Deployer reads the generated Docker Compose file to start services on the Docker engine| dc-compose-output
+    deployer -->|Applies generated manifests to| kubernetes-cluster
+    deployer -->|Starts services defined in the generated compose file on| docker-engine
+
+```
+
+### Flows
+
+#### Deploy to Kubernetes
+```mermaid
+sequenceDiagram
+    Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
+    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
+    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
+    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
+    Kubernetes Manifest Template ->> CALM CLI Templating: CALM CLI reads the Kubernetes Handlebars template
+    CALM CLI Templating ->> Generated Kubernetes Manifests: CALM CLI uses its templating engine to render the architecture into Kubernetes manifests
+    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Deployer ->> Generated Kubernetes Manifests: Deployer reads the generated Kubernetes manifests
+    Deployer ->> Kubernetes Cluster: Deployer applies the manifests to the Kubernetes cluster via kubectl
+```
+
+#### Deploy to Kubernetes
+```mermaid
+sequenceDiagram
+    Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
+    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
+    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
+    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
+    Kubernetes Manifest Template ->> CALM CLI Templating: CALM CLI reads the Kubernetes Handlebars template
+    CALM CLI Templating ->> Generated Kubernetes Manifests: CALM CLI uses its templating engine to render the architecture into Kubernetes manifests
+    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Deployer ->> Generated Kubernetes Manifests: Deployer reads the generated Kubernetes manifests
+    Deployer ->> Kubernetes Cluster: Deployer applies the manifests to the Kubernetes cluster via kubectl
+```
 
 ## CALM-Driven Kubernetes Deployment Flow
 
