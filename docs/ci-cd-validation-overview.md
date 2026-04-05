@@ -85,9 +85,9 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
         class application-system boundary
         subgraph approved-architecture-patterns-standards-controls["Approved Architecture Patterns/Standards/Controls"]
         direction TB
-            approved-controls["Approved Controls"]:::node
-            approved-standards["Approved Standards"]:::node
-            pattern-file["Pattern File"]:::node
+            approved-controls["CALM Controls"]:::node
+            pattern-file["CALM Pattern"]:::node
+            approved-standards["CALM Standards"]:::node
         end
         class approved-architecture-patterns-standards-controls boundary
         subgraph ci-cd-pipeline["CI/CD Pipeline"]
@@ -137,6 +137,8 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
     deployer -->|Applies generated manifests to| kubernetes-cluster
     deployer -->|Starts services defined in the generated compose file on| docker-engine
     approved-architecture-patterns-standards-controls -->|Incorporates approved patterns, standards and controls| application-system
+
+
 
 ```
 

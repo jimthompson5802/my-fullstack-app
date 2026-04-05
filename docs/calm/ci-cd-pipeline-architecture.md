@@ -34,9 +34,9 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
         class application-system boundary
         subgraph approved-architecture-patterns-standards-controls["Approved Architecture Patterns/Standards/Controls"]
         direction TB
-            approved-controls["Approved Controls"]:::node
-            approved-standards["Approved Standards"]:::node
-            pattern-file["Pattern File"]:::node
+            approved-controls["CALM Controls"]:::node
+            pattern-file["CALM Pattern"]:::node
+            approved-standards["CALM Standards"]:::node
         end
         class approved-architecture-patterns-standards-controls boundary
         subgraph ci-cd-pipeline["CI/CD Pipeline"]
@@ -132,19 +132,19 @@ FINOS CALM CLI tool that validates architectures against approved patterns and r
 CALM architecture JSON file describing the system to be deployed (e.g. my-fullstack-k8s.architecture.json)
 
 ---
-### Name: Pattern File  Type: data-asset
+### Name: CALM Pattern  Type: data-asset
 
-CALM pattern JSON file defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)
-
----
-### Name: Approved Standards  Type: data-asset
-
-Approved standards artifacts used as part of the source of truth for architecture validation
+Approved CALM Pattern  defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)
 
 ---
-### Name: Approved Controls  Type: data-asset
+### Name: CALM Standards  Type: data-asset
 
-Approved control artifacts used as part of the source of truth for architecture validation
+Approved CALM Standards artifacts used as part of the source of truth for architecture validation
+
+---
+### Name: CALM Controls  Type: data-asset
+
+Approved CALM Controls artifacts used as part of the source of truth for architecture validation
 
 ---
 ### Name: URL Mapping  Type: data-asset
@@ -211,7 +211,7 @@ sequenceDiagram
     Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
     Pipeline Orchestrator ->> Architecture Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
     Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
-    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    CALM Pattern ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
     URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
     Pipeline Orchestrator ->> Deployment Generation: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
     Architecture File ->> CALM CLI Templating: CALM CLI Templating reads the architecture file for rendering
@@ -231,7 +231,7 @@ sequenceDiagram
     Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
     Pipeline Orchestrator ->> Architecture Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
     Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
-    Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
+    CALM Pattern ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
     URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
     Pipeline Orchestrator ->> Deployment Generation: Pipeline Orchestrator invokes CALM CLI Templating to generate Docker Compose deployment artifacts
     Architecture File ->> CALM CLI Templating: CALM CLI Templating reads the architecture file for rendering
