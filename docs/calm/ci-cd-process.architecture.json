@@ -55,20 +55,20 @@
     {
       "unique-id": "pattern-file",
       "node-type": "data-asset",
-      "name": "Pattern File",
-      "description": "CALM pattern JSON file defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)"
+      "name": "CALM Pattern",
+      "description": "Approved CALM Pattern  defining the structural constraints the architecture must conform to (docs/calm/patterns/my-fullstack.pattern.json)"
     },
     {
       "unique-id": "approved-standards",
       "node-type": "data-asset",
-      "name": "Approved Standards",
-      "description": "Approved standards artifacts used as part of the source of truth for architecture validation"
+      "name": "CALM Standards",
+      "description": "Approved CALM Standards artifacts used as part of the source of truth for architecture validation"
     },
     {
       "unique-id": "approved-controls",
       "node-type": "data-asset",
-      "name": "Approved Controls",
-      "description": "Approved control artifacts used as part of the source of truth for architecture validation"
+      "name": "CALM Controls",
+      "description": "Approved CALM Controls artifacts used as part of the source of truth for architecture validation"
     },
     {
       "unique-id": "url-mapping",
