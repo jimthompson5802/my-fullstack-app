@@ -357,6 +357,16 @@
           "destination": { "node": "docker-engine" }
         }
       }
+    },
+    {
+      "unique-id": "approved-architecture-to-application-system",
+      "description": "Incorporates approved patterns, standards and controls",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "approved-architecture-patterns-standards-controls" },
+          "destination": { "node": "application-system" }
+        }
+      }
     }
   ],
   "flows": [
