@@ -121,14 +121,15 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
     kubernetes-cluster[🏢 Kubernetes Cluster]:::system
 
     deployment-operator -->|Deployment Operator interacts with the Pipeline Orchestrator to initiate pipeline execution| pipeline-orchestrator
-    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer| deployer
-    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment artifact generation to the Deployment Generation system| calm-cli-templating
-    pipeline-orchestrator -->|Pipeline Orchestrator invokes the CALM CLI to perform architecture validation| calm-cli-validation
+    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer| application-deployment
+    pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment artifact generation to the Deployment Generation system| deployment-generation
+    pipeline-orchestrator -->|Pipeline Orchestrator invokes the CALM CLI to perform architecture validation| architecture-validation
     calm-cli-templating -->|CALM CLI uses its templating engine to render the architecture into Kubernetes manifests via the Generate Kubernetes Deployment service| k8s-manifest-output
     calm-cli-templating -->|CALM CLI uses its templating engine to render the architecture into a Docker Compose file via the Generate Docker-Compose Deployment service| dc-compose-output
     architecture-file -->|Reads and validates the architecture from| calm-cli-validation
     pattern-file -->|Reads the structural pattern constraints from| calm-cli-validation
     url-mapping -->|Resolves schema $ref URLs using| calm-cli-validation
+    architecture-file -->|Architecture file is read by the CALM CLI Templating service for rendering deployment artifacts| calm-cli-templating
     k8s-template -->|Reads the Kubernetes manifest Handlebars template from| calm-cli-templating
     dc-template -->|Reads the Docker Compose Handlebars template from| calm-cli-templating
     deployer -->|Deployer reads the generated Kubernetes manifests to apply to the cluster| k8s-manifest-output
@@ -144,33 +145,36 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
 ```mermaid
 sequenceDiagram
     Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
-    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Pipeline Orchestrator ->> Architecture Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
     Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
     Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
     URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
-    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
+    Pipeline Orchestrator ->> Deployment Generation: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
+    Architecture File ->> CALM CLI Templating: CALM CLI Templating reads the architecture file for rendering
     Kubernetes Manifest Template ->> CALM CLI Templating: CALM CLI reads the Kubernetes Handlebars template
     CALM CLI Templating ->> Generated Kubernetes Manifests: CALM CLI uses its templating engine to render the architecture into Kubernetes manifests
-    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Pipeline Orchestrator ->> Application Deployment: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
     Deployer ->> Generated Kubernetes Manifests: Deployer reads the generated Kubernetes manifests
     Deployer ->> Kubernetes Cluster: Deployer applies the manifests to the Kubernetes cluster via kubectl
 ```
 
-#### Deploy to Kubernetes
+#### Deploy to Docker Compose
 ```mermaid
 sequenceDiagram
     Deployment Operator ->> Pipeline Orchestrator: Deployment Operator initiates the pipeline via the Pipeline Orchestrator
-    Pipeline Orchestrator ->> CALM CLI Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
+    Pipeline Orchestrator ->> Architecture Validation: Pipeline Orchestrator invokes CALM CLI to validate the architecture against the pattern
     Architecture File ->> CALM CLI Validation: CALM CLI reads the architecture file for validation
     Pattern File ->> CALM CLI Validation: CALM CLI reads the pattern file to validate architecture against
     URL Mapping ->> CALM CLI Validation: CALM CLI resolves schema $ref URLs using the URL mapping
-    Pipeline Orchestrator ->> CALM CLI Templating: Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts
-    Kubernetes Manifest Template ->> CALM CLI Templating: CALM CLI reads the Kubernetes Handlebars template
-    CALM CLI Templating ->> Generated Kubernetes Manifests: CALM CLI uses its templating engine to render the architecture into Kubernetes manifests
-    Pipeline Orchestrator ->> Deployer: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
-    Deployer ->> Generated Kubernetes Manifests: Deployer reads the generated Kubernetes manifests
-    Deployer ->> Kubernetes Cluster: Deployer applies the manifests to the Kubernetes cluster via kubectl
+    Pipeline Orchestrator ->> Deployment Generation: Pipeline Orchestrator invokes CALM CLI Templating to generate Docker Compose deployment artifacts
+    Architecture File ->> CALM CLI Templating: CALM CLI Templating reads the architecture file for rendering
+    Docker Compose Template ->> CALM CLI Templating: CALM CLI reads the Docker Compose Handlebars template
+    CALM CLI Templating ->> Generated Docker Compose File: CALM CLI uses its templating engine to render the architecture into a Docker Compose file
+    Pipeline Orchestrator ->> Application Deployment: Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer
+    Deployer ->> Generated Docker Compose File: Deployer reads the generated Docker Compose file
+    Deployer ->> Docker Engine: Deployer starts services on the Docker engine via docker compose up
 ```
+
 
 ## CALM-Driven Kubernetes Deployment Flow
 
@@ -315,7 +319,7 @@ info [calm-validate]:     Formatting output as json
 
 This [architecture](./calm/my-fullstack-k8s.architecture.json) passes the development organization's standard for [required metadata](./calm/standards/my-fullstack.standard.json).  The standard is part of development organization's [approved pattern](./calm/patterns/my-fullstack.pattern.json).
 
-Running [the same bash script](../calm-validate-and-deploy.sh) as before we see validation of the architecture and deployment of the application to the k8s cluster.
+Running [the same bash script](../calm-validate-and-deploy.sh) as before we see validation of the architecture and deployment of the application to the k8s cluster.  The CALM generated deployment artifacts can be found [here](../calm-generated-k8s/all-manifests.yaml).
 
 ```
 $ ./calm-validate-and-deploy.sh docs/calm/my-fullstack-k8s.architecture.json 
@@ -400,7 +404,7 @@ frontend-service   NodePort   10.96.139.122    <none>        80:30300/TCP     51
 
 This [architecture](./calm/my-fullstack-dc.architecture.json) passes the development organization's standard for [required metadata](./calm/standards/my-fullstack.standard.json).  The standard is part of development organization's [approved pattern](./calm/patterns/my-fullstack.pattern.json).
 
-Running [the same bash script](../calm-validate-and-deploy.sh) as before we see validation of the architecture and deployment of the application to the k8s cluster.
+Running [the same bash script](../calm-validate-and-deploy.sh) as before we see validation of the architecture and deployment of the application to the k8s cluster.  The CALM generated deployment artifacts can be found [here](../calm-generated-dc/docker-compose.yml).
 
 ```
 $ ./calm-validate-and-deploy.sh docs/calm/my-fullstack-dc.architecture.json 
