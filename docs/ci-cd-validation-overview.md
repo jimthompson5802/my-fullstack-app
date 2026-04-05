@@ -136,6 +136,7 @@ classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
     deployer -->|Deployer reads the generated Docker Compose file to start services on the Docker engine| dc-compose-output
     deployer -->|Applies generated manifests to| kubernetes-cluster
     deployer -->|Starts services defined in the generated compose file on| docker-engine
+    approved-architecture-patterns-standards-controls -->|Incorporates approved patterns, standards and controls| application-system
 
 ```
 
