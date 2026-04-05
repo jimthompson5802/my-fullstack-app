@@ -294,7 +294,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "k8s-template" },
-          "destination": { "node": "calm-cli-validation" }
+          "destination": { "node": "calm-cli-templating" }
         }
       }
     },
@@ -304,7 +304,7 @@
       "relationship-type": {
         "connects": {
           "source": { "node": "dc-template" },
-          "destination": { "node": "calm-cli-validation" }
+          "destination": { "node": "calm-cli-templating" }
         }
       }
     },
@@ -381,28 +381,33 @@
           "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
         },
         {
-          "relationship-unique-id": "cli-reads-k8s-template",
+          "relationship-unique-id": "orchestrator-to-deployment-generation",
           "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI Templating to generate Kubernetes deployment artifacts"
+        },
+        {
+          "relationship-unique-id": "cli-reads-k8s-template",
+          "sequence-number": 7,
           "description": "CALM CLI reads the Kubernetes Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-validation-to-generate-k8s",
-          "sequence-number": 7,
+          "sequence-number": 8,
           "description": "CALM CLI uses its templating engine to render the architecture into Kubernetes manifests"
         },
         {
           "relationship-unique-id": "orchestrator-to-deployer",
-          "sequence-number": 8,
+          "sequence-number": 9,
           "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
         },
         {
           "relationship-unique-id": "deployer-to-k8s-manifests",
-          "sequence-number": 9,
+          "sequence-number": 10,
           "description": "Deployer reads the generated Kubernetes manifests"
         },
         {
           "relationship-unique-id": "deploy-to-kubernetes",
-          "sequence-number": 10,
+          "sequence-number": 11,
           "description": "Deployer applies the manifests to the Kubernetes cluster via kubectl"
         }
       ]
@@ -438,28 +443,33 @@
           "description": "CALM CLI resolves schema $ref URLs using the URL mapping"
         },
         {
-          "relationship-unique-id": "cli-reads-dc-template",
+          "relationship-unique-id": "orchestrator-to-deployment-generation",
           "sequence-number": 6,
+          "description": "Pipeline Orchestrator invokes CALM CLI Templating to generate Docker Compose deployment artifacts"
+        },
+        {
+          "relationship-unique-id": "cli-reads-dc-template",
+          "sequence-number": 7,
           "description": "CALM CLI reads the Docker Compose Handlebars template"
         },
         {
           "relationship-unique-id": "calm-cli-validation-to-generate-dc",
-          "sequence-number": 7,
+          "sequence-number": 8,
           "description": "CALM CLI uses its templating engine to render the architecture into a Docker Compose file"
         },
         {
           "relationship-unique-id": "orchestrator-to-deployer",
-          "sequence-number": 8,
+          "sequence-number": 9,
           "description": "Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer"
         },
         {
           "relationship-unique-id": "deployer-to-dc-compose",
-          "sequence-number": 9,
+          "sequence-number": 10,
           "description": "Deployer reads the generated Docker Compose file"
         },
         {
           "relationship-unique-id": "deploy-to-docker-compose",
-          "sequence-number": 10,
+          "sequence-number": 11,
           "description": "Deployer starts services on the Docker engine via docker compose up"
         }
       ]
