@@ -20,6 +20,12 @@ classDef boundary fill:#e1e4f0,stroke:#204485,stroke-dasharray: 5 4,stroke-width
 classDef node fill:#eef1ff,stroke:#007dff,stroke-width:1px,color:#000000;
 classDef iface fill:#f0f0f0,stroke:#b6b6b6,stroke-width:1px,font-size:10px,color:#000000;
 classDef highlight fill:#fdf7ec,stroke:#f0c060,stroke-width:1px,color:#000000;
+classDef actor fill:#eef1ff,stroke:#007dff,stroke-width:1px,color:#000000;
+classDef database fill:#eef1ff,stroke:#2052a2,stroke-width:1px,color:#000000;
+classDef webclient fill:#eef1ff,stroke:#156edf,stroke-width:1px,color:#000000;
+classDef service fill:#eef1ff,stroke:#1c60c0,stroke-width:1px,color:#000000;
+classDef messagebus fill:#eef1ff,stroke:#1c60c0,stroke-width:1px,color:#000000;
+classDef system fill:#eef1ff,stroke:#204485,stroke-width:1px,color:#000000;
 
         subgraph application-system["Application System"]
         direction TB
@@ -39,29 +45,29 @@ classDef highlight fill:#fdf7ec,stroke:#f0c060,stroke-width:1px,color:#000000;
             dc-compose-output["Generated Docker Compose File"]:::node
             k8s-manifest-output["Generated Kubernetes Manifests"]:::node
             k8s-template["Kubernetes Manifest Template"]:::node
-            pipeline-orchestrator["Pipeline Orchestrator"]:::node
+            pipeline-orchestrator[/"⚙️ Pipeline Orchestrator"/]:::service
             url-mapping["URL Mapping"]:::node
                 subgraph application-deployment["Application Deployment"]
                 direction TB
-                    deployer["Deployer"]:::node
+                    deployer[/"⚙️ Deployer"/]:::service
                 end
                 class application-deployment boundary
                 subgraph architecture-validation["Architecture Validation"]
                 direction TB
-                    calm-cli-validation["CALM CLI Validation"]:::node
+                    calm-cli-validation[/"⚙️ CALM CLI Validation"/]:::service
                 end
                 class architecture-validation boundary
                 subgraph deployment-generation["Deployment Generation"]
                 direction TB
-                    calm-cli-templating["CALM CLI Templating"]:::node
+                    calm-cli-templating[/"⚙️ CALM CLI Templating"/]:::service
                 end
                 class deployment-generation boundary
         end
         class ci-cd-pipeline boundary
 
-    deployment-operator["Deployment Operator"]:::node
-    docker-engine["Docker Engine"]:::node
-    kubernetes-cluster["Kubernetes Cluster"]:::node
+    deployment-operator([👤 Deployment Operator]):::actor
+    docker-engine[🏢 Docker Engine]:::system
+    kubernetes-cluster[🏢 Kubernetes Cluster]:::system
 
     deployment-operator -->|Deployment Operator interacts with the Pipeline Orchestrator to initiate pipeline execution| pipeline-orchestrator
     pipeline-orchestrator -->|Pipeline Orchestrator delegates deployment of generated artifacts to the Deployer| deployer
