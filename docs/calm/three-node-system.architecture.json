@@ -1,0 +1,56 @@
+{
+    "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+    "unique-id": "three-node-system",
+    "name": "Three Node System",
+    "description": "Sample architecture with three nodes connected in sequence: node-a connects to node-b, node-b connects to node-c",
+    "nodes": [
+        {
+            "unique-id": "node-a",
+            "node-type": "service",
+            "name": "Node A",
+            "description": "First service in the chain"
+        },
+        {
+            "unique-id": "node-b",
+            "node-type": "service",
+            "name": "Node B",
+            "description": "Middle service in the chain"
+        },
+        {
+            "unique-id": "node-c",
+            "node-type": "unknown-type",
+            "name": "Node C",
+            "description": "Final service in the chain"
+        }
+    ],
+    "relationships": [
+        {
+            "unique-id": "node-a-to-node-b",
+            "description": "Sends requests to",
+            "relationship-type": {
+                "connects": {
+                    "source": {
+                        "node": "node-a"
+                    },
+                    "destination": {
+                        "node": "node-b"
+                    }
+                }
+            }
+        },
+        {
+            "unique-id": "node-b-to-node-c",
+            "description": "Sends requests to",
+            "relationship-type": {
+                "connects": {
+                    "source": {
+                        "node": "node-b"
+                    },
+                    "destination": {
+                        "node": "node-c"
+                    }
+                }
+            }
+        }
+    ]
+}

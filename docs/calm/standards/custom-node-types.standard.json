@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://my-fullstack-app.example.com/standards/custom-node-types.json",
+    "title": "Custom Node-Type Standard",
+    "description": "Restricts node-type to an approved set of standard CALM types plus organisation-specific custom types. All standard CALM node-types are preserved; additional custom types are added via the same enum.",
+    "allOf": [
+        {
+            "$ref": "https://calm.finos.org/release/1.2/meta/core.json#/defs/node"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "node-type": {
+                    "description": "The approved node-type for this architecture. Combines all core CALM types with organisation-specific custom types.",
+                    "enum": [
+                        "actor",
+                        "ecosystem",
+                        "system",
+                        "service",
+                        "database",
+                        "network",
+                        "ldap",
+                        "webclient",
+                        "data-asset",
+                        "external-proxy"
+                    ]
+                }
+            },
+            "required": ["node-type"]
+        }
+    ]
+}

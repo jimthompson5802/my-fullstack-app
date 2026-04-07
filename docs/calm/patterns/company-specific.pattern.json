@@ -1,0 +1,21 @@
+{
+    "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+    "$id": "https://my-fullstack-app.example.com/patterns/custom-typed-system.pattern.json",
+    "title": "Custom Node-Type Enforced Pattern",
+    "description": "Pattern that restricts all nodes to approved standard and custom node-types",
+    "type": "object",
+    "properties": {
+        "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "https://my-fullstack-app.example.com/standards/custom-node-types.json"
+            }
+        },
+        "relationships": {
+            "type": "array",
+            "minItems": 1
+        }
+    },
+    "required": ["nodes", "relationships"]
+}

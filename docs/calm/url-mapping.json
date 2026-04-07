@@ -1,3 +1,4 @@
 {
-  "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json": "standards/my-fullstack.standard.json"
+  "https://my-fullstack-app.example.com/standards/k8s-service-metadata.json": "standards/my-fullstack.standard.json",
+  "https://my-fullstack-app.example.com/standards/custom-node-types.json": "standards/custom-node-types.standard.json"
 }
